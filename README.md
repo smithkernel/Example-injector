@@ -7,3 +7,5 @@ An injector is simply a program that injects some sort of file into your game. T
 ### credits
 
 https://github.com/SarnaxLii
+
+[Discord](https://discord.gg/ADS8VHJndK)
