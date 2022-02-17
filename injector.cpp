@@ -50,4 +50,11 @@ int main() {
 	cout << "done!";
 
 	CloseHandle(process);
+	
+	char full_path[MAX_PATH];
+	GetFullPathName("test.dll", MAX_PATH, full_path, nullptr);
+}		cout << "Failed getting process id! Make sure .process. is running!";
+	CloseHandle(process);
+		}
+	}	
 }
