@@ -20,7 +20,3 @@
 > - come in to be the same society as us
 ***
 
-
-
-
-![90000](https://user-images.githubusercontent.com/94861415/157218019-3a677703-0a20-4c62-8a78-76e9e23a9caa.png)
