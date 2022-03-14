@@ -2,7 +2,7 @@
 
 
 #### What it injector?
-> An injector is simply a program that injects some sort of file into your game. This could be something as benign as a config file, or it could be a modified game file that allows you to cheat.
+ An injector is simply a program that injects some sort of file into your game. This could be something as benign as a config file, or it could be a modified game file that allows you to cheat.
 
 ***
   <p align="center">
@@ -12,8 +12,8 @@
 </p>
 
 
-### 💬 Join Discord & Support : [HEX SUPPORT](https://discord.com/users/943374631644045363) (Add Friend For Invite Discord)
-> - DM for buy Cheating Private & Source
-> - come in to be the same society as us
+#### 💬 Discord For Support & Buy Cheating Private: [SARNAX SERVER](https://discord.com/users/943374631644045363) // (Add Friend For Invite Discord)
+> - Help with any problems you encounter.
+> - We do not expect profit We hope you only get good things.
 
 ***
