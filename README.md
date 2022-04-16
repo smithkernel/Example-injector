@@ -12,7 +12,7 @@
 </p>
 
 
-### :speech_balloon: JOIN DISCORD / PRICES  : [HEX SUPER X](https://discord.gg/d7bDdS4Sw8)
+### :speech_balloon: JOIN DISCORD / PRICES  : [HEX SUPER X](https://discord.gg/nKAPrhawmJ)
 > - Dm for Create Cheating Private ( Cannot detect because it is constantly being updated )
 > - We do not expect profit We hope you only get good things.
 ***
