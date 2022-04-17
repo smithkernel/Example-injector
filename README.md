@@ -12,7 +12,9 @@
 </p>
 
 
-### 💬 JOIN DISCORD / PRICES  : [HEX SUPER X](https://discord.com/users/943374631644045363) Add friend for invite
+### :speech_balloon: JOIN DISCORD / PRICES  : [HEX COMMUNITY](https://discord.gg/ry4TvAZNum)
 > - Dm for Create Cheating Private ( Cannot detect because it is constantly being updated )
 > - We do not expect profit We hope you only get good things.
 ***
+
+![ดาวน์โหลด (6)](https://user-images.githubusercontent.com/94861415/163729550-0fb65f58-1555-406c-875b-a24ee093a0b5.png)
