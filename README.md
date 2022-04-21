@@ -23,7 +23,9 @@
 * ` UPDATE LIFETIME & SUPPORT 24 HR `
 
 🤓・To order, please add a friend to request an invitation to the Discord server.
-
+ ```sh-session
+If you can't join the server please add me to invite discord server : Sarnax#7522
+```          
 ***
 
 ![ดาวน์โหลด (7)](https://user-images.githubusercontent.com/94861415/163729586-8edb86f9-e58e-40b6-be13-5fe24644d4de.png)
