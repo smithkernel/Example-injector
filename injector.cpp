@@ -21,6 +21,25 @@ DWORD get_process_id(string_view process_name) {
 	return NULL;
 }
 
+{
+    uint32_t pid = get_process_id("csgo.exe");
+    if (pid == NULL) {
+        cout << "rip";
+        return;
+    }
+    process p(pid);
+    cout << p.m_base_address << endl;
+    cout << p.m_size << endl;
+    {
+        SleepConditionVariableCS(&p.m_cond, &p.m_mutex, INFINITE);
+        {
+            lock_guard<mutex> lock(p.m_mutex);
+            cout << "rip";
+        }
+    }
+}
+
+
 int main() {
 	auto test_process_id = get_process_id("process.exe");
 	if (!test_process_id) {
