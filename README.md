@@ -30,5 +30,3 @@
 MY CHEATS , YOU CAN PLAY ON THE MAIN ACCOUT. IT WON"T GET YOU BANNED :) / DM TO BUY 
 ```        
 ***
-
-![ดาวน์โหลด (7)](https://user-images.githubusercontent.com/94861415/163729586-8edb86f9-e58e-40b6-be13-5fe24644d4de.png)
