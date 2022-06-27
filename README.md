@@ -30,3 +30,5 @@
 MY CHEATS , YOU CAN PLAY ON THE MAIN ACCOUT. IT WON"T GET YOU BANNED :) / DM TO BUY 
 ```        
 ***
+
+<h2 align="center"> Copyright © 2021 - 2022
