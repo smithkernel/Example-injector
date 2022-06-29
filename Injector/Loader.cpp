@@ -10,6 +10,23 @@ const string REQUIRED_LIBS[] = {"asmjit.dll", "LetsHook.dll"};
 const string LIBS_PATH = "./libs/";
 
 
+ANDLE openProcess(int pid) {
+    return OpenProcess(PROCESS_ALL_ACCESS, false, pid);
+}
+
+LPVOID allocateMemory(HANDLE process, string dll_path) {
+    return VirtualAllocEx(process, NULL, dll_path.size() + 1, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+}
+
+void writeDLLPath(HANDLE process, string dll_path, LPVOID addr) {
+    WriteProcessMemory(process, addr, dll_path.c_str(), dll_path.size() + 1, NULL);
+}
+
+HANDLE loadDLL(HANDLE process, LPVOID addr) {
+    return CreateRemoteThread(process, nullptr, NULL, (LPTHREAD_START_ROUTINE)LoadLibraryA, addr, NULL, nullptr);
+}
+
+
 void Cleanup(const std::string message) {
     std::cout << message << std::endl;
     system("pause");
