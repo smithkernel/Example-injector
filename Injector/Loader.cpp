@@ -1,6 +1,15 @@
 #include "includes.h"
 #include "functions.h"
 
+
+using namespace std;
+
+const string VERSION = "1.2";
+const string AUTHOR = "h311d1n3r";
+const string REQUIRED_LIBS[] = {"asmjit.dll", "LetsHook.dll"};
+const string LIBS_PATH = "./libs/";
+
+
 void Cleanup(const std::string message) {
     std::cout << message << std::endl;
     system("pause");
