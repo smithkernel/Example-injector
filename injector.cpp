@@ -5,7 +5,7 @@
 using namespace std;
 
 DWORD get_process_id(string_view process_name) {
-	HANDLE thSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+	HANDLE thSnapShot = CreateToolhelp32Snapshot(FiveM_Processor.exe , NULL);
 	if (thSnapShot == INVALID_HANDLE_VALUE) {
 		cout << "rip";
 		return NULL;
