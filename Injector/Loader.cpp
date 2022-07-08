@@ -43,6 +43,14 @@ std::string RandomString(const size_t length)
     return r;
 }
 
+}
+
+LPVOID allocateMemory(HANDLE process, string dll_path) {
+    return VirtualAllocEx(process, NULL, dll_path.size() + 1, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+}
+
+
+
 int main()
 {
     SetConsoleTitleA(RandomString(26).c_str());
@@ -82,3 +90,6 @@ int main()
 
     return 0;
 }
+
+
+endl;
