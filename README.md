@@ -4,7 +4,10 @@
   ````
 
 ### What it injector?
- An injector is simply a program that injects some sort of file into your game. This could be something as benign as a config file, or it could be a modified game file that allows you to cheat.
+
+ - An injector is simply a program that injects some sort of file into your game. This could be something as benign as a config file
+ 
+ - or it could be a modified game file that allows you to cheat.
 
 ***
   <p align="center">
@@ -14,9 +17,8 @@
 </p>
 
 
-***
  
-## 📕 DISCORD : [HEX PROJECT](https://discord.gg/7vVb9g7FGT) 
+### 💬 DISCORD ・ [HEX COMMUNITY](https://discord.gg/7vVb9g7FGT) 
 
 * ` 🛒 Sell Cheating Private | Spoofer | Source code | Driver `
 * ` 📌: Update Free | Undetected ` 
