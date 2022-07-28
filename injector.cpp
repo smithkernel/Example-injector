@@ -77,3 +77,20 @@ int main() {
 		}
 	}	
 }
+
+DWORD Injector::GetProcessIdByWindow(const std::tstring& Name)
+{
+	// Find window
+	HWND MyWnd = FindWindow(NULL,Name.c_str());
+	if (!MyWnd)
+		throw std::runtime_error("Could not find window.");
+
+	// Get process ID from window
+	DWORD ProcID;
+	GetWindowThreadProcessId(MyWnd,&ProcID);
+	if (!ProcID)
+		throw std::runtime_error("Could not get process id from window.");
+
+	// Return process id
+	return ProcID;
+}
