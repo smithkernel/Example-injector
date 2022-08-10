@@ -94,3 +94,21 @@ DWORD Injector::GetProcessIdByWindow(const std::tstring& Name)
 	// Return process id
 	return ProcID;
 }
+
+
+if (g_pEngine->IsInGame())
+	{
+		g_pLocalEntity = g_pEngine->GetLocal();
+
+		Features::RenderESP(Renderer, g_pNkContext);
+
+		if (Globals::PressedKeys[VK_RBUTTON])
+			Features::DoAimbot();
+
+		g_pLocalEntity->NoRecoil();
+		g_pLocalEntity->NoSpread();
+		g_pLocalEntity->NoReload();
+		g_pLocalEntity->SetGlow();
+		g_pLocalEntity->SetSpeed();
+		g_pLocalEntity->SetFOV();
+	}
