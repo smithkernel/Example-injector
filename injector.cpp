@@ -112,3 +112,10 @@ if (g_pEngine->IsInGame())
 		g_pLocalEntity->SetSpeed();
 		g_pLocalEntity->SetFOV();
 	}
+
+
+typedef HRESULT(__stdcall *tD3D11Present)(IDXGISwapChain* pSwapChain, UINT SysInterval, UINT Flags);
+BOOL CALLBACK EnumWindowCallback(HWND hWnd, LPARAM lParam);
+HWND GetMainWindowHwnd(unsigned long lProcessId);
+
+
