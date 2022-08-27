@@ -119,3 +119,41 @@ BOOL CALLBACK EnumWindowCallback(HWND hWnd, LPARAM lParam);
 HWND GetMainWindowHwnd(unsigned long lProcessId);
 
 
+void OnProjectileUpdate(Projectile* unk) {
+	if (!unk)
+		return;
+
+	if(!settings::weapon::magic_bullet)
+		return Update(unk);
+
+	base_player* owner = (base_player*)safe_read(unk + 0xD0, DWORD64);
+	if (!owner)
+		return;
+
+	if (owner->is_local_player()) {
+		bool ret = false;
+		if (get_isAlive((base_projectile*)unk)) {
+			for (; unk->IsAlive(); unk->UpdateVelocity(0.03125f, unk, ret)) {
+				if (ret) {
+					break;
+				}
+
+				if (unk->launchTime() <= 0) {
+					break;
+				}
+
+				float time = get_time();
+
+				if (time - unk->launchTime() < unk->traveledTime() + 0.03125f) {
+					break;
+				}
+			}
+		}
+		else {
+			Retire(unk);
+		}
+	}
+}
+
+
+
