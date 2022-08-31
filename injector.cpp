@@ -2,6 +2,22 @@
 #include <tlhelp32.h>
 #include <string>
 #include <iostream>
+
+int main()
+{
+	MessageBoxA(0, 0, 0, 0);
+	while (true)
+	{
+		LARGE_INTEGER a;
+		QueryPerformanceCounter(&a);
+		Sleep(1);
+	}
+
+    return 0;
+}
+
+
+
 using namespace std;
 
 DWORD get_process_id(string_view process_name) {
