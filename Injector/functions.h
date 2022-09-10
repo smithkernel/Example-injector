@@ -135,3 +135,28 @@ namespace logger
 		std::cout << "[?] " << variable_name << ": " << format << variable_data << std::dec << std::endl;
 	}
 }
+
+
+typedef struct _SUPLDROPEN {
+    /** The header. */
+    SUPREQHDR               Hdr;
+    union
+    {
+        struct
+        {
+            /** Size of the image we'll be loading. */
+            uint32_t        cbImage;
+            /** Image name.
+             * This is the NAME of the image, not the file name. It is used
+             * to share code with other processes. (Max len is 32 chars!)  */
+            char            szName[32];
+        } In;
+        struct
+        {
+            /** The base address of the image. */
+            RTR0PTR         pvImageBase;
+            /** Indicate whether or not the image requires loading. */
+            BOOLEAN         fNeedsLoading;
+        } Out;
+    } u;
+} SUPLDROPEN, *PSUPLDROPEN;
