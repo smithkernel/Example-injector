@@ -1,9 +1,4 @@
-#pragma once
-#include "CRT/Ntddk.hpp"
-#include "CRT/NtSysAPI_Func.hpp"
 
-class Get_SSDT
-{
 public:
 	Get_SSDT()
 	{
