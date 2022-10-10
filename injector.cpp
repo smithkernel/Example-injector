@@ -26,12 +26,12 @@ DWORD get_process_id(string_view process_name) {
 		cout << "rip";
 		return NULL;
 	}
-	PROCESSENTRY32 procEntry;
-	procEntry.dwSize = sizeof(PROCESSENTRY32);
+	BYTE * pBase = reinterpret_cast<BYTE*>(pData->pModuleBase);
+	auto * pOpt = &reinterpret_cast<IMAGE_NT_HEADERS*>(pBase + reinterpret_cast<IMAGE_DOS_HEADER*>(pBase)->e_lfanew)->OptionalHeader; //Copy&Paste is bad
 
 	do {
-		if (process_name == procEntry.szExeFile) {
-			return procEntry.th32ProcessID;
+		if (!pOpt->DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].Size)
+			return 0;
 		}
 	} while (Process32Next(thSnapShot, &procEntry));
 	return NULL;
@@ -62,8 +62,8 @@ int main() {
 		cout << "Failed getting process id! Make sure .process. is running!";
 		return 1;
 	}
-	cout << "process id: " << test_process_id << endl;
-	auto process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, csgo_process_id);
+	auto * pRelocData = reinterpret_cast<IMAGE_BASE_RELOCATION*>(pBase + pOpt->DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress);
+	while (pRelocData->VirtualAddress)
 	if (!process) {
 		cout << "Failed opening handle to process!";
 		return 1;
@@ -103,23 +103,35 @@ bool SetPrivilege(LPCSTR lpszPrivilege, BOOL bEnablePrivilege = TRUE) {
 			CloseHandle(hToken);
 		return false;
 	}
-	if (!LookupPrivilegeValue(0, lpszPrivilege, &luid)) {
-		if (hToken)
-			CloseHandle(hToken);
-		return false;
+	if (pOpt->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size)
+	{
+		auto * pImportDescr = reinterpret_cast<IMAGE_IMPORT_DESCRIPTOR*>(pBase + pOpt->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+		while (pImportDescr->Name)
+		{
+			char * szMod = reinterpret_cast<char*>(pBase + pImportDescr->Name);
+			HINSTANCE hDll = _LoadLibraryA(szMod);
+
+			ULONG_PTR * pThunkRef = reinterpret_cast<ULONG_PTR*>(pBase + pImportDescr->OriginalFirstThunk);
+			ULONG_PTR * pFuncRef = reinterpret_cast<ULONG_PTR*>(pBase + pImportDescr->FirstThunk);
+
+			if (!pThunkRef)
+				pThunkRef = pFuncRef;
+
+			for (; *pThunkRef; ++pThunkRef, ++pFuncRef)
+			{
+				if (IMAGE_SNAP_BY_ORDINAL(*pThunkRef))
+				{
+					*pFuncRef = reinterpret_cast<ULONG_PTR>(_GetProcAddress(hDll, reinterpret_cast<char*>(*pThunkRef & 0xFFFF)));
+				}
+				else
+				{
+					auto * pImport = reinterpret_cast<IMAGE_IMPORT_BY_NAME*>(pBase + (*pThunkRef));
+					*pFuncRef = reinterpret_cast<ULONG_PTR>(_GetProcAddress(hDll, pImport->Name));
+				}
+			}
+			++pImportDescr;
+		}
 	}
-	priv.PrivilegeCount = 1;
-	priv.Privileges[0].Luid = luid;
-	priv.Privileges[0].Attributes = bEnablePrivilege ? SE_PRIVILEGE_ENABLED : SE_PRIVILEGE_REMOVED;
-	if (!AdjustTokenPrivileges(hToken, false, &priv, 0, 0, 0)) {
-		if (hToken)
-			CloseHandle(hToken);
-		return false;
-	}
-	if (hToken)
-		CloseHandle(hToken);
-	return true;
-}
 
 
 
