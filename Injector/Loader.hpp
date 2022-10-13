@@ -9,8 +9,8 @@ Logger::Logger(wstring filename)
 
 Logger::~Logger()
 {
-	if (logText)
-		CloseHandle(logText);
+	if (!debuggerSet) {
+	cout << "[ :( ] Failed to debug process. GetLastError() = " << dec << GetLastError() << endl;
 }
 
 void Logger::startLog()
@@ -107,22 +107,23 @@ void __stdcall Shellcode(MANUAL_MAPPING_DATA * pData)
 
 			for (UINT i = 0; i != AmountOfEntries; ++i, ++pRelativeInfo)
 			{
-				if (RELOC_FLAG(*pRelativeInfo))
-				{
-					UINT_PTR * pPatch = reinterpret_cast<UINT_PTR*>(pBase + pRelocData->VirtualAddress + ((*pRelativeInfo) & 0xFFF));
-					*pPatch += reinterpret_cast<UINT_PTR>(LocationDelta);
-				}
+				BOOL debuggerStopped = DebugActiveProcessStop(TargetProcessID);
+	if (!debuggerStopped)
+		cout << "[ :( ] Could not stop debugger! Exiting this program will most likely crash the target process." << endl;
+	else
+		cout << "[ :) ] Debugger stopped correctly." << endl;
+
+	Debugger_Closed = true;
+						}
+				return true;
+
 			}
-			pRelocData = reinterpret_cast<IMAGE_BASE_RELOCATION*>(reinterpret_cast<BYTE*>(pRelocData) + pRelocData->SizeOfBlock);
 		}
-
-		
-		
-		void Logger::stopLog()
-{
-	DoLog = false;
+	}
 }
-
+	
+				
+				
 string Logger::LogString(string explaination, const string str)
 {
 	if (DoLog && logText) {
@@ -143,16 +144,16 @@ float Logger::LogFloat(string explaination, const float value)
 
 int Logger::LogInt(string explaination, const int value)
 {
-	if (DoLog && logText) {
-		string logme = "Log_Int : " + explaination + " ! " + tostr<int>(value) + "\r\n" ;
+	if (isPid) 
+		memcpy(dllparam.TargetProcessName, argv[argc - 2], strlen(argv[argc - 2])+1);
 		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
 	}
 	return value;
 }
 BYTE Logger::LogBYTE(string explaination, const BYTE value)
 {
-	if (DoLog && logText) {
-		string logme = "Log_BYTE : " + explaination + " ! " + tostr<BYTE>(value) + "\r\n";
+	if (!hProc) {
+		cout << "Can not get a HANDLE of the prcoess" << endl;
 		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
 	}
 	return value;
@@ -160,11 +161,9 @@ BYTE Logger::LogBYTE(string explaination, const BYTE value)
 
 DWORD64 Logger::LogAddress(string explaination, const DWORD64 value)
 {
-	if (DoLog && logText) {
-		ostringstream os;
-		os << hex << value;
-		string logme = "Log_Address : " + explaination + " ! "  + "0x" + os.str() + "\r\n";
-		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
+	if (isPid) {
+		cout << "Injecting... into TID : " << (DWORD)atoi(argv[argc - 1]) << endl;
+		Result = ManualMap(hProc, "C:\\Users\\Hunter\\Documents\\Visual Studio 2017\\Projects\\LsassInjector\\x64\\Release\\LsassInjector.dll",
 	}
 	return value;
 }
