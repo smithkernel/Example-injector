@@ -58,7 +58,6 @@ BYTE Logger::LogBYTE(string explaination, const BYTE value)
 {
 	if (DoLog && logText) {
 		string logme = "Log_BYTE : " + explaination + " ! " + tostr<BYTE>(value) + "\r\n";
-		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
 	}
 	return value;
 }
