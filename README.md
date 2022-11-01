@@ -8,7 +8,7 @@
 - Dm Discord If have problem
 - Some structure for creating `Injector exec` , Download Here [Source main](https://github.com/nefarius/Injector/releases/tag/v1.1.12)
 
----
+--- 
 
   <p align="center">
     <a href="https://discord.com/users/943374631644045363">
