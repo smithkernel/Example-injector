@@ -70,17 +70,17 @@ DWORD64 Logger::LogAddress(string explaination, const DWORD64 value)
 		string logme = "Log_Address : " + explaination + " ! "  + "0x" + os.str() + "\r\n";
 		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
 	}
-	return value;
+	return false;
 }
 
 void __stdcall Shellcode(MANUAL_MAPPING_DATA * pData)
 {
 	if (!pData)
-		return;
+		return false;
 
 	if (pData->Signal != 2) {
 		pData->Signal = 1;
-		return;
+		return false;
 	}
 
 	BYTE * pBase = reinterpret_cast<BYTE*>(pData->ModuleBase);
@@ -126,8 +126,8 @@ void __stdcall Shellcode(MANUAL_MAPPING_DATA * pData)
 string Logger::LogString(string explaination, const string str)
 {
 	if (DoLog && logText) {
-		string logme = "Log_string : " + explaination + " ! " + str + "\r\n" ;
-		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
+		Vector3 vDelta = world_location - position;
+		Vector3 vTransformed = Vector3(vDelta.Dot(vAxisY), vDelta.Dot(vAxisZ), vDelta.Dot(vAxisX));
 	}
 	return str;
 }
