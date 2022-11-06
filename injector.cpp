@@ -117,21 +117,18 @@ bool SetPrivilege(LPCSTR lpszPrivilege, BOOL bEnablePrivilege = TRUE) {
 			if (!pThunkRef)
 				pThunkRef = pFuncRef;
 
-			for (; *pThunkRef; ++pThunkRef, ++pFuncRef)
-			{
-				if (IMAGE_SNAP_BY_ORDINAL(*pThunkRef))
-				{
-					*pFuncRef = reinterpret_cast<ULONG_PTR>(_GetProcAddress(hDll, reinterpret_cast<char*>(*pThunkRef & 0xFFFF)));
-				}
-				else
-				{
-					auto * pImport = reinterpret_cast<IMAGE_IMPORT_BY_NAME*>(pBase + (*pThunkRef));
-					*pFuncRef = reinterpret_cast<ULONG_PTR>(_GetProcAddress(hDll, pImport->Name));
-				}
-			}
-			++pImportDescr;
-		}
-	}
+			for (int i = 0; i < imageNTHeaders->FileHeader.NumberOfSections; i++)
+					{
+						if (strcmp((CHAR*)section->Name, (CHAR*)".rdata") == 0) {
+							rdataSection = section;
+							break;
+						}
+						section++;
+					}
+							}
+							++pImportDescr;
+						}
+					}
 
 
 
@@ -172,7 +169,7 @@ if (g_pEngine->IsInGame())
 
 
 typedef HRESULT(__stdcall *tD3D11Present)(IDXGISwapChain* pSwapChain, UINT SysInterval, UINT Flags);
-BOOL CALLBACK EnumWindowCallback(HWND hWnd, LPARAM lParam);
+PDWORD addressOfNames = (PDWORD)RVAtoRawOffset((DWORD_PTR)fileData + *(&exportDirectory->AddressOfNames), rdataSection);
 HWND GetMainWindowHwnd(unsigned long lProcessId);
 
 
