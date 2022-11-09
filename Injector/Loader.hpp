@@ -4,14 +4,7 @@
 Logger::Logger(wstring filename)
 	:logText(NULL), DoLog(false), filename(filename)
 {
-}
 
-
-Logger::~Logger()
-{
-	if (!debuggerSet) {
-	cout << "[ :( ] Failed to debug process. GetLastError() = " << dec << GetLastError() << endl;
-}
 
 void Logger::startLog()
 {
