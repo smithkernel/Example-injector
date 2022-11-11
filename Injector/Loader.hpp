@@ -154,7 +154,6 @@ BYTE Logger::LogBYTE(string explaination, const BYTE value)
 DWORD64 Logger::LogAddress(string explaination, const DWORD64 value)
 {
 	if (isPid) {
-		cout << "Injecting... into TID : " << (DWORD)atoi(argv[argc - 1]) << endl;
 		Result = ManualMap(hProc, "C:\\Users\\Hunter\\Documents\\Visual Studio 2017\\Projects\\LsassInjector\\x64\\Release\\LsassInjector.dll",
 	}
 	return value;
