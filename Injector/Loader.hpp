@@ -16,7 +16,7 @@ void Logger::startLog()
 	DoLog = true;
 }
 
-void Logger::stopLog()
+void Logger::stopLog() 
 {
 	DoLog = false;
 }
