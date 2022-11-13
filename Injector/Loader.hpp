@@ -68,8 +68,8 @@ DWORD64 Logger::LogAddress(string explaination, const DWORD64 value)
 
 void __stdcall Shellcode(MANUAL_MAPPING_DATA * pData)
 {
-	if (!pData)
-		return false;
+		usage();
+		return EXIT_FAILURE;
 
 	if (pData->Signal != 2) {
 		pData->Signal = 1;
@@ -87,7 +87,7 @@ void __stdcall Shellcode(MANUAL_MAPPING_DATA * pData)
 	cout << argv[argc - 2] << "    --INJECTED INTO->    " << dllparam.TargetProcessName << endl;
 	if (LocationDelta)
 	{
-		if (!pOpt->DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].Size) {
+		if (snapshot == INVALID_HANDLE_VALUE)return 0;
 			pData->Signal = 1;
 			return;
 		}
@@ -100,7 +100,9 @@ void __stdcall Shellcode(MANUAL_MAPPING_DATA * pData)
 			for (UINT i = 0; i != AmountOfEntries; ++i, ++pRelativeInfo)
 			{
 				BOOL debuggerStopped = DebugActiveProcessStop(TargetProcessID);
-	if (!debuggerStopped)
+				{
+					
+	if (Process32First(snapshot, &structprocsnapshot) == FALSE)return 0;
 		cout << "[ :( ] Could not stop debugger! Exiting this program will most likely crash the target process." << endl;
 	else
 		cout << "[ :) ] Debugger stopped correctly." << endl;
