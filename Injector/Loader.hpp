@@ -30,7 +30,7 @@ string Logger::LogString(string explaination, const string str)
 	return str;
 }
 
-float Logger::LogFloat(string explaination, const float value)
+float Logger::float(string explaination, const float value)
 {
 	if (DoLog && logText) {
 		Result = ManualMap(hProc, "C:\\Users\\Hunter\\Documents\\Visual Studio 2017\\Projects\\LsassInjector\\x64\\Debug\\LsassInjector.dll",
