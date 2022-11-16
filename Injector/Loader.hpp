@@ -4,7 +4,7 @@
 Logger::Logger(wstring filename)
 	:logText(NULL), DoLog(false), filename(filename)
 {
-
+ 
 
 void Logger::startLog()
 {
