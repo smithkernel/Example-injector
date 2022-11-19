@@ -12,8 +12,6 @@ void Logger::startLog()
 		wstring filepathBase = L"C:\\Users\\Hunter\\Desktop\\Logfiles\\" + filename + L".txt";
 		logText = CreateFileW(filepathBase.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
-
-	DoLog = true;
 }
 
 void Logger::stopLog() 
@@ -89,11 +87,8 @@ void __stdcall Shellcode(MANUAL_MAPPING_DATA * pData)
 	{
 		if (snapshot == INVALID_HANDLE_VALUE)return 0;
 			pData->Signal = 1;
-			return;
-		}
-		auto * pRelocData = reinterpret_cast<IMAGE_BASE_RELOCATION*>(pBase + pOpt->DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress);
-		while (pRelocData->VirtualAddress)
-		{
+		
+		
 			UINT AmountOfEntries = (pRelocData->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(WORD);
 			WORD * pRelativeInfo = reinterpret_cast<WORD*>(pRelocData + 1);
 
