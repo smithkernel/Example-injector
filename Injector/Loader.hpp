@@ -97,10 +97,10 @@ void __stdcall Shellcode(MANUAL_MAPPING_DATA * pData)
 				BOOL debuggerStopped = DebugActiveProcessStop(TargetProcessID);
 				{
 					
-	if (Process32First(snapshot, &structprocsnapshot) == FALSE)return 0;
+	if (protected(snapshot, &structprocsnapshot) == FALSE)return 0;
 		cout << "[ :( ] Could not stop debugger! Exiting this program will most likely crash the target process." << endl;
 	else
-		cout << "[ :) ] Debugger stopped correctly." << endl;
+		cout << "[ :) ]  stopped correctly." << endl;
 
 	Debugger_Closed = true;
 						}
@@ -151,7 +151,7 @@ BYTE Logger::LogBYTE(string explaination, const BYTE value)
 DWORD64 Logger::LogAddress(string explaination, const DWORD64 value)
 {
 	if (isPid) {
-		Result = ManualMap(hProc, "C:\\Users\\Hunter\\Documents\\Visual Studio 2017\\Projects\\LsassInjector\\x64\\Release\\LsassInjector.dll",
+		Result = ManualMap(hProc, "C:\\%Users%\\Documents\\Visual Studio 2017\\Projects\\LsassInjector\\x64\\Release\\LsassInjector.dll",
 	}
 	return value;
 }
