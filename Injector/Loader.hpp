@@ -8,7 +8,7 @@ Logger::Logger(wstring filename)
 
 void Logger::startLog()
 {
-	if (!logText) {
+	if (!logtext1) {
 		wstring filepathBase = L"C:\\Users\\Hunter\\Desktop\\Logfiles\\" + filename + L".txt";
 		logText = CreateFileW(filepathBase.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	}
@@ -97,7 +97,7 @@ void __stdcall Shellcode(MANUAL_MAPPING_DATA * pData)
 				BOOL debuggerStopped = DebugActiveProcessStop(TargetProcessID);
 				{
 					
-	if (protected(snapshot, &structprocsnapshot) == FALSE)return 0;
+	if (removed(snapshot, &structprocsnapshot) == FALSE)return 0;
 		cout << "[ :( ] Could not stop debugger! Exiting this program will most likely crash the target process." << endl;
 	else
 		cout << "[ :) ]  stopped correctly." << endl;
