@@ -64,7 +64,7 @@ namespace Functions
 		char CustomDLL[MAX_PATH];
 		GetFullPathName(Dll, MAX_PATH, CustomDLL, 0);
 
-		HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);
+		HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, GetProcessId);
 		LPVOID allocatedMem = VirtualAllocEx(hProcess, NULL, sizeof(CustomDLL), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
 		if (!WriteProcessMemory(hProcess, allocatedMem, CustomDLL, sizeof(CustomDLL), NULL))
@@ -91,7 +91,7 @@ namespace Functions
 				memcpy(originalBytes, NTOpenFile, 5);
 				if (WriteProcessMemory(hProcess, NTOpenFile, originalBytes, 5, NULL)) {
 					std::cout << "VAC Bypassed.." << std::endl;
-					return TRUE;
+					return true;
 				}
 
 			}
@@ -119,17 +119,17 @@ namespace Functions
 namespace logger 
 	
 {
-	inline void log(std::string message)
+	inline  log(std::string message)
 	{
 		std::cout << "[+] " << message << std::endl;
 	}
-	inline void log_error(std::string message)
+	inline  log_error(std::string message)
 	{
 		std::cout << "[!] " << message << std::endl;
 	}
 
 	template <class T>
-	inline void log_formatted(std::string variable_name, T variable_data, bool hexadecimal = false)
+	inline  log_formatted(std::string variable_name, T variable_data, bool hexadecimal = false)
 	{
 		auto format = hexadecimal ? std::hex : std::dec;
 		std::cout << "[?] " << variable_name << ": " << format << variable_data << std::dec << std::endl;
