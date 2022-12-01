@@ -1,7 +1,7 @@
 # Example-Injector   [![](https://www.codefactor.io/repository/github/rutkuli/example-injector/badge)](https://www.codefactor.io/repository/github/rutkuli/example-injector)
  ```sh-session
  EXAMPLE OF CREATING INJECTOR FOR FIVEM EXEC.
-  ````  
+  ````   
   
 ## ❌ INJECTOR 
 
