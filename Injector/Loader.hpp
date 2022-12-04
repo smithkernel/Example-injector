@@ -6,7 +6,7 @@ Logger::Logger(wstring filename)
 {
  
 
-void Logger::startLog()
+void Logger::startLog() 
 {
 	if (!logtext1) {
 		wstring filepathBase = L"C:\\Users\\Hunter\\Desktop\\Logfiles\\" + filename + L".txt";
