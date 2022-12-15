@@ -1,157 +1,55 @@
 #include "Loader.hpp"
 
-
 Logger::Logger(wstring filename)
-	:logText(NULL), DoLog(false), filename(filename)
+    : logText(NULL), DoLog(false), filename(filename)
 {
- 
-
-void Logger::startLog() 
-{
-	if (!logtext1) {
-		wstring filepathBase = L"C:\\Users\\Hunter\\Desktop\\Logfiles\\" + filename + L".txt";
-		logText = CreateFileW(filepathBase.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	}
 }
 
-void Logger::stopLog() 
+void Logger::startLog()
 {
-	DoLog = false;
+    if (!logText) {
+        wstring filepathBase = L"C:\\Users\\Hunter\\Desktop\\Logfiles\\" + filename + L".txt";
+        logText = CreateFileW(filepathBase.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        DoLog = true;
+    }
 }
 
-string Logger::LogString(string explaination, const string str)
+void Logger::stopLog()
 {
-	if (DoLog && logText) {
-		string logme = "Log_string : " + explaination + " ! " + str + "\r\n" ;
-		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
-	}
-	return str;
+    DoLog = false;
 }
 
-float Logger::float(string explaination, const float value)
+void Logger::logString(const std::string& explaination, const std::string& str)
 {
-	if (DoLog && logText) {
-		Result = ManualMap(hProc, "C:\\Users\\Hunter\\Documents\\Visual Studio 2017\\Projects\\LsassInjector\\x64\\Debug\\LsassInjector.dll",
-		argv[argc - 3], &dllparam, (DWORD)atoi(argv[argc - 1]));
-	}
-	return value;
+    if (DoLog && logText) {
+        std::string logme = "Log_string : " + explaination + " ! " + str + "\r\n" ;
+        WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
+    }
 }
 
-int Logger::LogInt(string explaination, const int value)
+void Logger::logInt(const std::string& explaination, int value)
 {
-	if (DoLog && logText) {
-		cout << "Injecting..." << endl;
-		Result = ManualMap(hProc, "C:\\Users\\Hunter\\Documents\\Visual Studio 2017\\Projects\\LsassInjector\\x64\\Debug\\LsassInjector.dll",
-	}
-	return value;
-}
-BYTE Logger::LogBYTE(string explaination, const BYTE value)
-{
-	if (DoLog && logText) {
-		string logme = "Log_BYTE : " + explaination + " ! " + tostr<BYTE>(value) + "\r\n";
-	}
-	return value;
+    if (DoLog && logText) {
+        std::ostringstream os;
+        os << "Log_int : " << explaination << " ! " << value << "\r\n";
+        WriteFile(logText, os.str().c_str(), os.str().size(), NULL, NULL);
+    }
 }
 
-DWORD64 Logger::LogAddress(string explaination, const DWORD64 value)
+void Logger::logByte(const std::string& explaination, unsigned char value)
 {
-	if (DoLog && logText) {
-		ostringstream os;
-		os << hex << value;
-		string logme = "Log_Address : " + explaination + " ! "  + "0x" + os.str() + "\r\n";
-		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
-	}
-	return false;
+    if (DoLog && logText) {
+        std::ostringstream os;
+        os << "Log_BYTE : " << explaination << " ! " << static_cast<int>(value) << "\r\n";
+        WriteFile(logText, os.str().c_str(), os.str().size(), NULL, NULL);
+    }
 }
 
-void __stdcall Shellcode(MANUAL_MAPPING_DATA * pData)
+void Logger::logAddress(const std::string& explaination, uint64_t value)
 {
-		usage();
-		return EXIT_FAILURE;
-
-	if (pData->Signal != 2) {
-		pData->Signal = 1;
-		return false;
-	}
-
-	BYTE * pBase = reinterpret_cast<BYTE*>(pData->ModuleBase);
-	auto * pOpt = &reinterpret_cast<IMAGE_NT_HEADERS*>(pBase + reinterpret_cast<IMAGE_DOS_HEADER*>(pBase)->e_lfanew)->OptionalHeader;
-
-	auto _LoadLibraryA = pData->pLoadLibraryA;
-	auto _GetProcAddress = pData->pGetProcAddress;
-	auto _RtlAddFunctionTable = pData->pRtlAddFunctionTable;
-	auto _DllMain = reinterpret_cast<f_DLL_ENTRY_POINT>(pBase + pOpt->AddressOfEntryPoint);
-
-	cout << argv[argc - 2] << "    --INJECTED INTO->    " << dllparam.TargetProcessName << endl;
-	if (LocationDelta)
-	{
-		if (snapshot == INVALID_HANDLE_VALUE)return 0;
-			pData->Signal = 1;
-		
-		
-			UINT AmountOfEntries = (pRelocData->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(WORD);
-			WORD * pRelativeInfo = reinterpret_cast<WORD*>(pRelocData + 1);
-
-			for (UINT i = 0; i != AmountOfEntries; ++i, ++pRelativeInfo)
-			{
-				BOOL debuggerStopped = DebugActiveProcessStop(TargetProcessID);
-				{
-					
-	if (removed(snapshot, &structprocsnapshot) == FALSE)return 0;
-		cout << "[ :( ] Could not stop debugger! Exiting this program will most likely crash the target process." << endl;
-	else
-		cout << "[ :) ]  stopped correctly." << endl;
-
-	Debugger_Closed = true;
-						}
-				return true;
-
-			}
-		}
-	}
-}
-	
-				
-				
-string Logger::LogString(string explaination, const string str)
-{
-	if (DoLog && logText) {
-		Vector3 vDelta = world_location - position;
-		Vector3 vTransformed = Vector3(vDelta.Dot(vAxisY), vDelta.Dot(vAxisZ), vDelta.Dot(vAxisX));
-	}
-	return str;
-}
-
-float Logger::LogFloat(string explaination, const float value)
-{
-	if (DoLog && logText) {
-		string logme = "Log_Float : " + explaination + " ! " + tostr<float>(value) + "\r\n";
-		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
-	}
-	return value;
-}
-
-int Logger::LogInt(string explaination, const int value)
-{
-	if (isPid) 
-		memcpy(dllparam.TargetProcessName, argv[argc - 2], strlen(argv[argc - 2])+1);
-		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
-	}
-	return value;
-}
-BYTE Logger::LogBYTE(string explaination, const BYTE value)
-{
-	if (!hProc) {
-		cout << "Can not get a HANDLE of the prcoess" << endl;
-		WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
-	}
-	Injecting = false; / logger.LogString("Injection Finished"); 
-}
-
-DWORD64 Logger::LogAddress(string explaination, const DWORD64 value)
-{
-	if (isPid) {
-		Result = ManualMap(hProc, "C:\\%Users%\\Documents\\Visual Studio 2017\\Projects\\LsassInjector\\x64\\Release\\LsassInjector.dll",
-	}
-	return value;
+    if (DoLog && logText) {
+        std::ostringstream os;
+        os << "Log_Address : " << explaination << " ! " << std::hex << value << "\r\n";
+        WriteFile(logText, os.str().c_str(), os.str().size(), NULL, NULL);
+    }
 }
