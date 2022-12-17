@@ -5,69 +5,76 @@
 
 using namespace std;
 
-DWORD get_process_id(string_view process_name) {
-    HANDLE thSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
-    if (thSnapShot == INVALID_HANDLE_VALUE) {
-        cout << "Failed to create snapshot of processes!" << endl;
-        return NULL;
+// RAII wrapper for HANDLEs that automatically closes the handle when it goes out of scope
+struct unique_handle
+{
+    HANDLE handle;
+    unique_handle(HANDLE h = INVALID_HANDLE_VALUE) : handle(h) {}
+    ~unique_handle() { if (handle != INVALID_HANDLE_VALUE) CloseHandle(handle); }
+    operator HANDLE() const { return handle; }
+};
+
+// RAII wrapper for HMODULEs that automatically frees the module when it goes out of scope
+struct unique_module
+{
+    HMODULE module;
+    unique_module(HMODULE h = nullptr) : module(h) {}
+    ~unique_module() { if (module) FreeLibrary(module); }
+    operator HMODULE() const { return module; }
+};
+
+// Gets the ID of a process with the specified name
+DWORD get_process_id(wstring_view process_name)
+{
+    unique_handle thSnapShot(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL));
+    if (thSnapShot == INVALID_HANDLE_VALUE)
+    {
+        cout << "Failed to create snapshot of processes: " << GetLastError() << endl;
+        return 0;
     }
 
     PROCESSENTRY32 procEntry;
     procEntry.dwSize = sizeof(procEntry);
 
-    if (!Process32First(thSnapShot, &procEntry)) {
-        cout << "Failed to retrieve information about the first process in the snapshot!" << endl;
-        return NULL;
+    if (!Process32First(thSnapShot, &procEntry))
+    {
+        cout << "Failed to retrieve information about the first process in the snapshot: " << GetLastError() << endl;
+        return 0;
     }
 
-    do {
-        if (strcmp(process_name.data(), procEntry.szExeFile) == 0) {
-            CloseHandle(thSnapShot);
+    do
+    {
+        if (wcscmp(process_name.data(), procEntry.szExeFile) == 0)
+        {
             return procEntry.th32ProcessID;
         }
     } while (Process32Next(thSnapShot, &procEntry));
 
-    CloseHandle(thSnapShot);
-    return NULL;
+    return 0;
 }
 
-int main() {
-    uint32_t pid = get_process_id("process.exe");
-    if (pid == NULL) {
-        cout << "Failed to find process.exe! Make sure it is running." << endl;
+int main()
+{
+    // Convert ASCII process name to wide string
+    wchar_t process_name[MAX_PATH] = {};
+    if (!MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, "process.exe", -1, process_name, MAX_PATH))
+    {
+        cout << "Failed to convert process name to wide string: " << GetLastError() << endl;
         return 1;
     }
 
-    HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
-    if (!process) {
-        cout << "Failed to open handle to process.exe!" << endl;
+    // Get process ID
+    DWORD pid = get_process_id(process_name);
+    if (!pid)
+    {
+        wcout << "Failed to find process " << process_name << "! Make sure it is running." << endl;
         return 1;
     }
 
-    char full_path[MAX_PATH];
-    GetFullPathName("test.dll", MAX_PATH, full_path, nullptr);
-
-    cout << "DLL path: " << full_path << endl;
-
-    HMODULE hKernel32 = GetModuleHandle("kernel32.dll");
-    if (!hKernel32) {
-        cout << "Failed to get handle to kernel32.dll!" << endl;
-        return 1;
-    }
-
-    LPTHREAD_START_ROUTINE pLoadLibrary = reinterpret_cast<LPTHREAD_START_ROUTINE>(GetProcAddress(hKernel32, "LoadLibraryA"));
-    if (!pLoadLibrary) {
-        cout << "Failed to get address of LoadLibraryA function in kernel32.dll!" << endl;
-        return 1;
-    }
-
-    LPVOID pRemoteString = VirtualAllocEx(process, nullptr, strlen(full_path), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-    if (!pRemoteString) {
-        cout << "Failed to allocate memory in process.exe for DLL path!" << endl;
-        return 1;
-    }
-
-    if (!WriteProcessMemory(process, pRemoteString, full_path, strlen(full_path), nullptr)) {
-        cout << "Failed to write DLL path to memory in process.exe!" << endl;
+    // Open handle to process
+    unique_handle process(OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid));
+    if (!process)
+    {
+        cout << "Failed to open handle to process: " << GetLastError() << endl;
         return 1;
     }
