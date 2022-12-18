@@ -83,7 +83,7 @@ namespace Functions
             return false;
         }
 
-        CreateRemoteThread(hProcess, 0, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(LoadLibrary), allocatedMem, 0, 0);
+        CreateRemoteThread(hProcess, nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(LoadLibrary), allocatedMem, 0, nullptr);
 
         if (hProcess)
         {
@@ -92,7 +92,4 @@ namespace Functions
 
         return true;
     }
-
-    namespace Internal
-    {
-        bool Exec
+}
