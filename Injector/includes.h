@@ -1,3 +1,1 @@
-#pragma once
-
-PVOID BBGetModuleExport(IN PVOID pBase, IN PCCHAR name_ord);
+void* GetModuleExport(void* pBase, const char* name_ord);
