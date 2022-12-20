@@ -1,80 +1,64 @@
-#include <windows.h>
-#include <tlhelp32.h>
-#include <string>
+#include <Windows.h>
 #include <iostream>
+#include <string>
+#include <memory>
 
-using namespace std;
-
-// RAII wrapper for HANDLEs that automatically closes the handle when it goes out of scope
-struct unique_handle
+// Returns the process ID of the process with the given name.
+// Returns 0 if the process was not found.
+DWORD get_process_id(const wchar_t* process_name)
 {
-    HANDLE handle;
-    unique_handle(HANDLE h = INVALID_HANDLE_VALUE) : handle(h) {}
-    ~unique_handle() { if (handle != INVALID_HANDLE_VALUE) CloseHandle(handle); }
-    operator HANDLE() const { return handle; }
-};
-
-// RAII wrapper for HMODULEs that automatically frees the module when it goes out of scope
-struct unique_module
-{
-    HMODULE module;
-    unique_module(HMODULE h = nullptr) : module(h) {}
-    ~unique_module() { if (module) FreeLibrary(module); }
-    operator HMODULE() const { return module; }
-};
-
-// Gets the ID of a process with the specified name
-DWORD get_process_id(wstring_view process_name)
-{
-    unique_handle thSnapShot(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL));
-    if (thSnapShot == INVALID_HANDLE_VALUE)
+    // Get snapshot of all processes
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == INVALID_HANDLE_VALUE)
     {
-        cout << "Failed to create snapshot of processes: " << GetLastError() << endl;
+        std::cerr << "Failed to create snapshot of processes: " << GetLastError() << std::endl;
         return 0;
     }
 
-    PROCESSENTRY32 procEntry;
-    procEntry.dwSize = sizeof(procEntry);
-
-    if (!Process32First(thSnapShot, &procEntry))
+    // Iterate through processes
+    PROCESSENTRY32W process_entry;
+    process_entry.dwSize = sizeof(PROCESSENTRY32W);
+    if (Process32FirstW(snapshot, &process_entry))
     {
-        cout << "Failed to retrieve information about the first process in the snapshot: " << GetLastError() << endl;
-        return 0;
-    }
-
-    do
-    {
-        if (wcscmp(process_name.data(), procEntry.szExeFile) == 0)
+        do
         {
-            return procEntry.th32ProcessID;
-        }
-    } while (Process32Next(thSnapShot, &procEntry));
+            // Check if process name matches
+            if (wcscmp(process_entry.szExeFile, process_name) == 0)
+            {
+                // Process found
+                CloseHandle(snapshot);
+                return process_entry.th32ProcessID;
+            }
+        } while (Process32NextW(snapshot, &process_entry));
+    }
 
+    // Process not found
+    CloseHandle(snapshot);
     return 0;
 }
 
 int main()
 {
     // Convert ASCII process name to wide string
-    wchar_t process_name[MAX_PATH] = {};
-    if (!MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, "process.exe", -1, process_name, MAX_PATH))
-    {
-        cout << "Failed to convert process name to wide string: " << GetLastError() << endl;
-        return 1;
-    }
+    std::string process_name_str = "process.exe";
+    std::wstring process_name_wstr(process_name_str.begin(), process_name_str.end());
+    const wchar_t* process_name = process_name_wstr.c_str();
 
     // Get process ID
     DWORD pid = get_process_id(process_name);
     if (!pid)
     {
-        wcout << "Failed to find process " << process_name << "! Make sure it is running." << endl;
+        std::wcerr << "Failed to find process " << process_name << "! Make sure it is running." << std::endl;
         return 1;
     }
 
     // Open handle to process
-    unique_handle process(OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid));
+    std::unique_ptr<void, decltype(&CloseHandle)> process(OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid), &CloseHandle);
     if (!process)
     {
-        cout << "Failed to open handle to process: " << GetLastError() << endl;
+        std::cerr << "Failed to open handle to process: " << GetLastError() << std::endl;
         return 1;
     }
+
+    return 0;
+}
