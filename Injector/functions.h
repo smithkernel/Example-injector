@@ -7,89 +7,114 @@
 #include <iostream>
 #include <string>
 
-namespace Functions
+namespace processUtils
 {
-    bool DoesFileExist(const char* name)
+    DWORD GetProcessId(const wchar_t* processName)
     {
-        std::ifstream file(name);
-        return file.good();
-    }
+        DWORD pid = 0;
+        HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
-    DWORD GetProcessId(const char* processName)
-    {
-        HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+        if (hSnapshot == INVALID_HANDLE_VALUE)
+            return 0;
 
         PROCESSENTRY32 pe32;
-        pe32.dwSize = sizeof(pe32);
+        pe32.dwSize = sizeof(PROCESSENTRY32);
 
-        if (!Process32First(hSnap, &pe32))
+        if (!Process32First(hSnapshot, &pe32))
         {
-            CloseHandle(hSnap);
+            CloseHandle(hSnapshot);
             return 0;
         }
 
         do
         {
-            if (std::strcmp(pe32.szExeFile, processName) == 0)
+            if (!_wcsicmp(processName, pe32.szExeFile))
             {
-                CloseHandle(hSnap);
-                return pe32.th32ProcessID;
+                pid = pe32.th32ProcessID;
+                break;
             }
 
-        } while (Process32Next(hSnap, &pe32));
+        } while (Process32Next(hSnapshot, &pe32));
 
-        CloseHandle(hSnap);
-        return 0;
+        CloseHandle(hSnapshot);
+        return pid;
     }
 
-    uintptr_t GetModuleBaseAddress(DWORD pid, const char* modName)
+    HANDLE GetProcessHandle(DWORD pid)
     {
-        HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid);
-        if (hSnap != INVALID_HANDLE_VALUE)
+        return OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
+    }
+
+    HANDLE GetProcessHandle(const wchar_t* processName)
+    {
+        DWORD pid = GetProcessId(processName);
+        return GetProcessHandle(pid);
+    }
+
+    uintptr_t GetModuleBaseAddress(DWORD pid, const wchar_t* moduleName)
+    {
+        HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid);
+
+        if (hSnapshot == INVALID_HANDLE_VALUE)
+            return 0;
+
+        MODULEENTRY32 me32;
+        me32.dwSize = sizeof(MODULEENTRY32);
+
+        if (!Module32First(hSnapshot, &me32))
         {
-            MODULEENTRY32 modEntry;
-            modEntry.dwSize = sizeof(modEntry);
-            if (Module32First(hSnap, &modEntry))
+            CloseHandle(hSnapshot);
+            return 0;
+        }
+
+        uintptr_t baseAddress = 0;
+        do
+        {
+            if (!_wcsicmp(moduleName, me32.szModule))
             {
-                do
-                {
-                    if (std::strcmp(modEntry.szModule, modName) == 0)
-                    {
-                        CloseHandle(hSnap);
-                        return reinterpret_cast<uintptr_t>(modEntry.modBaseAddr);
-                    }
-                } while (Module32Next(hSnap, &modEntry));
+                baseAddress = (uintptr_t)me32.modBaseAddr;
+                break;
             }
-        }
+        } while (!Module32Next(hSnapshot, &me32));
 
-        return 0;
+        CloseHandle(hSnapshot);
+        return baseAddress;
     }
 
-    bool LoadLibraryInject(DWORD processId, const char* dll)
+    uintptr_t GetModuleBaseAddress(const wchar_t* moduleName)
     {
-        if (processId == 0)
+        return reinterpret_cast<uintptr_t>(GetModuleHandle(moduleName));
+    }
+
+    std::list<MODULEENTRY32>* ListModules(DWORD pid)
+    {
+        std::list<MODULEENTRY32>* modules = new std::list<MODULEENTRY32>();
+        HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pid);
+
+        if (hSnapshot == INVALID_HANDLE_VALUE)
+            return modules;
+
+        MODULEENTRY32 me32;
+        me32.dwSize = sizeof(MODULEENTRY32);
+
+        if (!Module32First(hSnapshot, &me32))
         {
-            return false;
+            CloseHandle(hSnapshot);
+            return modules;
         }
 
-        char customDll[MAX_PATH];
-        GetFullPathName(dll, MAX_PATH, customDll, nullptr);
-
-        HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processId);
-        LPVOID allocatedMem = VirtualAllocEx(hProcess, NULL, sizeof(customDll), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-
-        if (!WriteProcessMemory(hProcess, allocatedMem, customDll, sizeof(customDll), NULL))
+        while (true)
         {
-            return false;
+            MODULEENTRY32 mod;
+            mod.dwSize = sizeof(MODULEENTRY32);
+
+            if (!Module32Next(hSnapshot, &mod))
+                break;
+
+            modules->push_back(mod);
         }
 
-        CreateRemoteThread(hProcess, nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(LoadLibrary), allocatedMem, 0, nullptr);
-
-        if (hProcess)
-        {
-            CloseHandle(hProcess);
-        }
-
-        return true;
+        CloseHandle(hSnapshot);
+        return modules;
     }
 }
