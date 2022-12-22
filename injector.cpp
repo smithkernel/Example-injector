@@ -62,3 +62,39 @@ int main()
 
     return 0;
 }
+
+void PcreateProcessNotifyRoutineEx(
+	_In_ PEPROCESS Process,
+	_In_ HANDLE ProcessId,
+	_In_ PPS_CREATE_NOTIFY_INFO CreateInfo
+)
+{
+	PCHAR pszProcessNameA = nullptr;
+	WCHAR pszProcessNameW[MAX_PROCESS_NAME_LENGTH] = { 0 };
+	size_t pcbProcessNameLength = 0;
+	BOOLEAN bIsOnList = FALSE;
+
+	pszProcessNameA = (PCHAR)PsGetProcessImageFileName(Process);
+	bIsOnList = IsProcessInInjectionList(pszProcessNameA);
+
+	if (NULL == CreateInfo || FALSE == bIsOnList)
+	{
+		if (TRUE == bIsOnList)
+		{
+			DbgPrint("Removing %s [%d] from list", pszProcessNameA, ProcessId);
+			RtlStringCbLengthA(
+				(STRSAFE_PCNZCH)pszProcessNameA,
+				MAX_PROCESS_NAME_LENGTH,
+				&pcbProcessNameLength
+			);
+			RtlMultiByteToUnicodeN(
+				pszProcessNameW, MAX_PROCESS_NAME_LENGTH * 2, 
+				NULL, 
+				pszProcessNameA,
+				pcbProcessNameLength
+			);
+			pProcessLinkedList->RemoveEntryByData(pszProcessNameW, (ULONG)ProcessId);
+		}
+		return;
+	}
+ 
