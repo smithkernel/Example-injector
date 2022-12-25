@@ -1,30 +1,32 @@
 # Example-Injector   [![](https://www.codefactor.io/repository/github/rutkuli/example-injector/badge)](https://www.codefactor.io/repository/github/rutkuli/example-injector)
- ```sh-session
- EXAMPLE OF CREATING INJECTOR FOR FIVEM EXEC.
-  ````   
     
-## ❌ INJECTOR 
+ ---
+ 
+ 
+## 🚨 Exec
 
-- Dm Discord If have problem
+- sample source
 - Some structure for creating `Injector exec` , Download Here [Source main](https://github.com/nefarius/Injector/releases/tag/v1.1.12)
+
+## Source
+
+- This source is free and for educational purposes, if you want to use it commercially please contact me.
   
   
   ![fivem-hile-59211083](https://user-images.githubusercontent.com/94861415/207850617-a137b430-0ce5-427b-8ade-e287372db3e3.png)
 
   
----
+--- 
 
-  <p align="center"> 
-    <a href="https://discord.com/users/943374631644045363"> 
-        <img title="Fnoberz server discord" alt="Fnoberz's discord" src="https://discord.c99.nl/widget/theme-4/943374631644045363.png"/>
+  <p align="center">
+    <a href="https://discord.gg/MBTkVcJefp">
+        <img title="Slackes server discord" alt="Slackes discord" src="https://discordapp.com/api/guilds/880135738077896764/widget.png?style=banner2"/>
     </a>
 </p> 
  
-### 💬 ・HELP & SUPPORT | [Discord](https://discord.gg/MBTkVcJefp) 
+## 💬 ・[Discord](https://discord.gg/MBTkVcJefp) 
 
-
- ### 🛒〢 `PRIVATE CHEAT`
- More Here [Information](https://github.com/Club-CC/Detail)
+ ### 🛒〢 `PRODUCT`
  
 <table>
 <tr>
@@ -34,17 +36,18 @@
 </table>
 
   
-### 🎯 〢 Product Cheat
+### 🥊 〢 Private Cheat
 
-- Lifetime + Update Free
+- Lifetime 
+- Free Updates 
+- Undetected
 - Custom Feature if you want `(Example: Aimbot + Esp + Skin Changers)`
-- Undetected and can be played on the main account.
 
+### ⚓〢 Warranty
 
-### 💯〢 Warranty Product.
-
-- Support 24 Hr + Update Free
-- IF Banned = REFUND
+- Support 24 Hr
+- Update Free
+- If banned = `REFUND`
 
 A website that I created to introduce myself from start to finish. hope you like it [Slackes.me](http://slackes.me/)
 
