@@ -98,3 +98,76 @@ void PcreateProcessNotifyRoutineEx(
 		return;
 	}
  
+DWORD Injector::GetProcessId()
+{
+	ULONG cbBuffer = 131072;
+	void* pBuffer = NULL;
+	NTSTATUS Status = STATUS_INFO_LENGTH_MISMATCH;
+	void* hHeap = GetProcessHeap();
+
+	DWORD processId_ = 0;
+
+	const char* process = processName.getCharPointer();
+	std::string name(process);
+	if (!strstr(process, ".exe"))
+		name += ".exe";
+
+	bool check = false;
+	bool found = false;
+	while (!found)
+	{
+		pBuffer = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, cbBuffer);
+		if (pBuffer == NULL)
+			return 0;
+
+		Status = fnQSI(SystemProcessInformation, pBuffer, cbBuffer, &cbBuffer);
+		if (Status == STATUS_INFO_LENGTH_MISMATCH)
+		{
+			check = true;
+			HeapFree(hHeap, NULL, pBuffer);
+			cbBuffer *= 2;
+		}
+		else if (!NT_SUCCESS(Status))
+		{
+			HeapFree(hHeap, NULL, pBuffer);
+			return 0;
+		}
+		else
+		{
+			check = false;
+
+			PSYSTEM_PROCESSES infoP = (PSYSTEM_PROCESSES)pBuffer;
+			while (infoP)
+			{
+				char pName[256];
+				memset(pName, 0, sizeof(pName));
+				WideCharToMultiByte(0, 0, infoP->ProcessName.Buffer, infoP->ProcessName.Length, pName, 256, NULL, NULL);
+				if (_stricmp(name.c_str(), pName) == 0)
+				{
+					processId_ = infoP->ProcessId;
+					found = true;
+
+					break;
+				}
+
+				if (!infoP->NextEntryDelta)
+					break;
+				infoP = (PSYSTEM_PROCESSES)((unsigned char*)infoP + infoP->NextEntryDelta);
+			}
+			if (pBuffer)
+				HeapFree(hHeap, NULL, pBuffer);
+		}
+
+		if (processId_ != 0)
+		{
+			break;
+		}
+		else if (!check)
+		{
+			// Don't continuously search...
+			break;
+		}
+	}
+
+	return processId_;
+}
