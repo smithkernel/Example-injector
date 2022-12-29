@@ -171,3 +171,67 @@ DWORD Injector::GetProcessId()
 
 	return processId_;
 }
+
+HRESULT Injector::ManualMap(String filePath)
+{
+	DLL = filePath;
+
+	if (!autoInject)
+		isReady = true;
+
+	if (!isReady)
+		return 0;
+
+	if (!CheckValidProcessExtension(processName.getCharPointer()))
+	{
+		MessageBox(0, "Invalid Process Name!", "Injectora", MB_ICONEXCLAMATION);
+		isReady = false;
+		return 1;
+	}
+
+	if (strlen(filePath.getCharPointer()) < 5)
+	{
+		printf("Select a DLL first!\n");
+		isReady = false;
+		return 2;
+	}
+
+	File file(filePath);
+	if (!file.exists())
+	{
+		MessageBox(0, "File selected to be injected does not exist!", "Injectora", MB_ICONERROR);
+		isReady = false;
+		return 2;
+	}
+
+	if (!Setup())
+	{
+		isReady = false;
+		return 3;
+	}
+
+	HMODULE ret = remoteLoader.LoadLibraryByPathIntoMemoryA(filePath.toStdString().c_str(), false);
+	if (!ret)
+	{
+		MessageBox(0, "Failed to Manual Map inject!", "Injectora", MB_ICONERROR);
+		isReady = false;
+		return 4;
+	}
+
+	// Beep of success
+	MessageBeep(MB_OK);
+	//if (!closeOnInject && !autoInject) {
+	//	MessageBox(0, "Manual Map Success!", "Injectora", MB_ICONASTERISK);
+	//}
+	
+	oldProcessIds.add(processId);
+
+	CloseHandle(processHandle);
+	
+	isReady = false;
+
+	if (closeOnInject)
+		PostQuitMessage(0);
+	
+	return 0;
+}
