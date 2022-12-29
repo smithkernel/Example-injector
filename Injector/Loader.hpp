@@ -28,10 +28,15 @@ int main(){
     return 0;
 }
 
+#include <fstream>
+#include <mutex>
+
 class Logger
 {
 public:
-    Logger(wstring filename);
+    explicit Logger(std::wstring filename);
+    ~Logger();
+
     void startLog();
     void stopLog();
     void logString(const std::string& explaination, const std::string& str);
@@ -40,39 +45,25 @@ public:
     void logAddress(const std::string& explaination, uint64_t value);
 
 private:
-    // RAII wrapper for HANDLEs that automatically closes the handle when it goes out of scope
-    struct unique_handle
-    {
-        HANDLE handle;
-        unique_handle(HANDLE h = INVALID_HANDLE_VALUE) : handle(h) {}
-        ~unique_handle() { if (handle != INVALID_HANDLE_VALUE) CloseHandle(handle); }
-        operator HANDLE() const { return handle; }
-    };
-
-    unique_handle logText;
+    std::ofstream log_file;
     bool DoLog;
-    wstring filename;
-    std::mutex log_mutex; // mutex to synchronize access to the log file
+    std::wstring filename;
+    std::mutex log_mutex;
 };
 
-Logger::Logger(wstring filename)
-    : logText(INVALID_HANDLE_VALUE), DoLog(false), filename(filename)
+Logger::Logger(std::wstring filename)
+    : log_file(filename), DoLog(false)
 {
+}
+
+Logger::~Logger()
+{
+    log_file.close();
 }
 
 void Logger::startLog()
 {
-    if (logText == INVALID_HANDLE_VALUE)
-    {
-        wstring filepathBase = L"C:\\Users\\Hunter\\Desktop\\Logfiles\\" + filename + L".txt";
-        logText = unique_handle(CreateFileW(filepathBase.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL));
-        if (logText == INVALID_HANDLE_VALUE)
-        {
-            cout << "Failed to create log file: " << GetLastError() << endl;
-            return;
-        }
-        DoLog = true;
-    }
+    DoLog = true;
 }
 
 void Logger::stopLog()
@@ -82,38 +73,63 @@ void Logger::stopLog()
 
 void Logger::logString(const std::string& explaination, const std::string& str)
 {
-    if (DoLog && logText != INVALID_HANDLE_VALUE)
-    {
-        std::lock_guard<std::mutex> lock(log_mutex); // lock mutex to synchronize access to the log file
-        std::string logme = "Log_string : " + explaination + " ! " + str + "\r\n";
-        WriteFile(logText, logme.c_str(), logme.size(), NULL, NULL);
-        FlushFileBuffers(logText); // flush log file buffer to disk
+    std::lock_guard<std::mutex> lock(log_mutex);
+    if (DoLog) {
+        log_file << explaination << ": " << str << '\n';
     }
 }
 
 void Logger::logInt(const std::string& explaination, int value)
 {
-    if (DoLog && logText) {
-        std::ostringstream os;
-        os << "Log_int : " << explaination << " ! " << value << "\r\n";
-        WriteFile(logText, os.str().c_str(), os.str().size(), NULL, NULL);
+    std::lock_guard<std::mutex> lock(log_mutex);
+    if (DoLog) {
+        log_file << explaination << ": " << value << '\n';
     }
 }
 
 void Logger::logByte(const std::string& explaination, unsigned char value)
 {
-    if (DoLog && logText) {
-        std::ostringstream os;
-        os << "Log_BYTE : " << explaination << " ! " << static_cast<int>(value) << "\r\n";
-        WriteFile(logText, os.str().c_str(), os.str().size(), NULL, NULL);
+    std::lock_guard<std::mutex> lock(log_mutex);
+    if (DoLog) {
+        log_file << explaination << ": " << static_cast<int>(value) << '\n';
     }
 }
 
 void Logger::logAddress(const std::string& explaination, uint64_t value)
 {
-    if (DoLog && logText) {
-        std::ostringstream os;
-        os << "Log_Address : " << explaination << " ! " << std::hex << value << "\r\n";
-        WriteFile(logText, os.str().c_str(), os.str().size(), NULL, NULL);
+    std::lock_guard<std::mutex> lock(log_mutex);
+    if (DoLog) {
+        log_file << explaination << ": " << value << '\n';
     }
+}
+
+
+void Injector::timerCallback()
+{
+	DWORD pidCheck = GetProcessId();		
+	if (pidCheck != 0 && !canInject)
+	{
+		//if (pidCheck == processId)
+		//{
+			canInject = true;
+			for (int i = 0; i < oldProcessIds.size(); i++)
+			{
+				if (oldProcessIds[i] == pidCheck)
+				{
+					//MessageBox(0, "Module already loaded into this process!", "Injectora", MB_ICONEXCLAMATION);
+					canInject = false;
+					break;
+				}
+			}
+
+			if (canInject)
+			{
+				isReady = true;
+				if (isManualMap)
+					ManualMap(DLL);
+				else
+					LoadLibraryInject(DLL);
+			}
+		//}
+	}
 }
