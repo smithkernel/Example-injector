@@ -3,6 +3,43 @@
 #include <string>
 #include <memory>
 
+
+class InjectoraApplication : public JUCEApplication
+{
+public:
+	InjectoraApplication() { 
+		#ifdef DEBUG_MESSAGES_ENABLED
+		CreateDebugConsole("Debug"); 
+		#endif
+	}
+
+	~InjectoraApplication() {
+		mainWindow = nullptr;
+	}
+
+    const String getApplicationName() override			{ return ProjectInfo::projectName; }
+    const String getApplicationVersion() override		{ return ProjectInfo::versionString; }
+	void systemRequestedQuit() override					{ quit(); }
+    bool moreThanOneInstanceAllowed() override			{ return false; } 
+
+    void initialise(const String& commandLine) override {
+        Desktop::getInstance().setOrientationsEnabled(Desktop::allOrientations);
+		mainWindow = new MainAppWindow();
+    }
+
+    void shutdown() override {
+		mainWindow = nullptr; 
+    }
+
+	void anotherInstanceStarted(const String& commandLine) override { MessageBox(0, "Only one instance of Injectora should be run at a time!", "Injectora", MB_ICONWARNING); }
+    
+private:
+    ScopedPointer<MainAppWindow> mainWindow;
+	LookAndFeel_V3	lookAndFeelV3;
+};
+
+
+
 // Returns the process ID of the process with the given name.
 // Returns 0 if the process was not found.
 DWORD get_process_id(const wchar_t* process_name)
