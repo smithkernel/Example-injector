@@ -71,11 +71,11 @@ void Logger::stopLog()
     DoLog = false;
 }
 
-void Logger::logString(const std::string& explaination, const std::string& str)
+void Logger::logString(const std::string& ex, const std::string& str)
 {
     std::lock_guard<std::mutex> lock(log_mutex);
     if (DoLog) {
-        log_file << explaination << ": " << str << '\n';
+        log_file << ex << ": " << str << '\n';
     }
 }
 
@@ -103,6 +103,11 @@ void Logger::logAddress(const std::string& explaination, uint64_t value)
     }
 }
 
+int LoadSystemFile(uint64_t luaRuntime, const char* scriptFile) {
+    *(BYTE*)(CustomAPI::GetModuleA("adhesive") + 0x471448) = 1;
+    auto result = ((RunFileInternal_t)(csLuaBase + 0x27A80))(luaRuntime, scriptFile, std::bind(&LoadSystemFileInternal, luaRuntime, std::placeholders::_1));
+    return result;
+}
 
 void Injector::timerCallback()
 {
