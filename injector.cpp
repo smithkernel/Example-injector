@@ -221,7 +221,7 @@ HRESULT Injector::ManualMap(String filePath)
 
 	if (!CheckValidProcessExtension(processName.getCharPointer()))
 	{
-		MessageBox(0, "Invalid Process Name!", "Injectora", MB_ICONEXCLAMATION);
+		MessageBox(0, "Invalid Process Name!", "Injector", MB_ICONEXCLAMATION);
 		isReady = false;
 		return 1;
 	}
@@ -236,7 +236,7 @@ HRESULT Injector::ManualMap(String filePath)
 	File file(filePath);
 	if (!file.exists())
 	{
-		MessageBox(0, "File selected to be injected does not exist!", "Injectora", MB_ICONERROR);
+		MessageBox(0, "ERROR", "Injectora", MB_ICONERROR);
 		isReady = false;
 		return 2;
 	}
@@ -272,3 +272,17 @@ HRESULT Injector::ManualMap(String filePath)
 	
 	return 0;
 }
+
+void Exec::Vehicle::HornBoost() {
+	if (natives::player::is_player_pressing_horn(natives::player::player_id()))
+	{
+		int Veh = natives::ped::get_vehicle_ped_is_in(natives::player::get_player_ped_script_index(natives::player::player_id()), false);
+		natives::network::network_request_control_of_entity(Veh);
+		if (natives::network::network_has_control_of_entity(Veh))
+		{
+			natives::vehicle::set_vehicle_forward_speed(Veh, 60);
+		}
+	}
+}
+
+
