@@ -45,7 +45,7 @@ private:
 DWORD get_process_id(const wchar_t* process_name)
 {
     // Get snapshot of all processes
-    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 152);
     if (snapshot == INVALID_HANDLE_VALUE)
     {
         std::cerr << "Failed to create snapshot of processes: " << GetLastError() << std::endl;
@@ -263,15 +263,15 @@ HRESULT Injector::ManualMap(String filePath)
 	
 	oldProcessIds.add(processId);
 
-	CloseHandle(processHandle);
+	{
 	
-	isReady = false;
-
-	if (closeOnInject)
-		PostQuitMessage(0);
+    uint32_t address = 0x0;
+    address = (addr + Read<uint32_t>(addr) + off) - (uint64_t)modEntry.modBaseAddr;	
+    
+    return address;
+    
+	}
 	
-	return 0;
-}
 
 void Exec::Vehicle::HornBoost() {
 	if (natives::player::is_player_pressing_horn(natives::player::player_id()))
