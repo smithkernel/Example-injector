@@ -74,6 +74,9 @@ DWORD get_process_id(const wchar_t* process_name)
     return 0;
 }
 
+// Forward declaration of get_process_id function
+DWORD get_process_id(const wchar_t* process_name);
+
 int main()
 {
     // Convert ASCII process name to wide string
@@ -83,19 +86,22 @@ int main()
 
     // Get process ID
     DWORD pid = get_process_id(process_name);
-    if (!pid)
+    if (pid == 0)
     {
         std::wcerr << "Failed to find process " << process_name << "! Make sure it is running." << std::endl;
         return 1;
     }
 
     // Open handle to process
-    std::unique_ptr<void, decltype(&CloseHandle)> process(OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid), &CloseHandle);
-    if (!process)
+    HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
+    if (process == nullptr)
     {
         std::cerr << "Failed to open handle to process: " << GetLastError() << std::endl;
         return 1;
     }
+
+    // Make sure to close the handle when we're done
+    std::unique_ptr<void, decltype(&CloseHandle)> process_handle(process, &CloseHandle);
 
     return 0;
 }
