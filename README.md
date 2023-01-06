@@ -35,6 +35,7 @@
 ![fivem-hile-59211083](https://user-images.githubusercontent.com/94861415/207850617-a137b430-0ce5-427b-8ade-e287372db3e3.png)
 
 ## <a id="setup2"></a> 📞 〢 Support
+- If the free version does not work The last option is to pay. Read more below.
 - If you have any questions or don't understand the instructions, join Discord for help.
 - [Discord](https://discord.gg/MBTkVcJefp)
 
