@@ -50,7 +50,7 @@ Source
  
 ## 💬 ・[Discord](https://discord.gg/MBTkVcJefp) 
 
- ### 🛒〢 `PRODUCT`
+ ### 🛒〢 `SHOP`
  
 <table>
 <tr>
