@@ -45,16 +45,19 @@ private:
 DWORD get_process_id(const wchar_t* process_name)
 {
     // Get snapshot of all processes
-    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 152);
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (snapshot == INVALID_HANDLE_VALUE)
     {
         std::cerr << "Failed to create snapshot of processes: " << GetLastError() << std::endl;
         return 0;
     }
 
-    // Iterate through processes
+    // Initialize process entry structure
     PROCESSENTRY32W process_entry;
+    ZeroMemory(&process_entry, sizeof(PROCESSENTRY32W));
     process_entry.dwSize = sizeof(PROCESSENTRY32W);
+
+    // Iterate through processes
     if (Process32FirstW(snapshot, &process_entry))
     {
         do
