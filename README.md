@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  For education
+  Examples of Injector Eec that can be used in practice
 </p>
 
 
@@ -19,7 +19,7 @@
  ---
  
  
-## <a id="content"></a>🚨 〢 Exec
+## <a id="content"></a>🚨 〢 Exec 
 
 
 - Fivem Exec / Dumper Scripts / Resource
@@ -27,17 +27,17 @@
 
 <br>
 
- Source
+Source
 
 - This source is free and for educational purposes, if you want to use it commercially please contact me.
   
   
 ![fivem-hile-59211083](https://user-images.githubusercontent.com/94861415/207850617-a137b430-0ce5-427b-8ade-e287372db3e3.png)
 
-## <a id="setup2"></a> 📞 〢 Support
-- If the free version does not work The last option is to pay. Read more below.
-- If you have any questions or don't understand the instructions, join Discord for help.
-- [Discord](https://discord.gg/MBTkVcJefp)
+## <a id="setup2"></a> 🗒 〢 Product
+- If the free version does not work You can pay to buy a personal project.
+- Safe  on main account without getting banned / no need to turn off virus scan Scroll down to the bottom to read more.
+- [Discord](https://discord.gg/MBTkVcJefp) 
 
   
 --- 
@@ -67,7 +67,7 @@
 - Undetected
 - Custom Feature if you want `(Example: Aimbot + Esp + Skin Changers)`
 
-### ⚓〢 Warranty
+### 📌〢 Warranty
 
 - Support 24 Hr
 - Update Free
