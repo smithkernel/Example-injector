@@ -74,10 +74,14 @@ void Logger::stopLog()
 void Logger::logString(const std::string& ex, const std::string& str)
 {
     std::lock_guard<std::mutex> lock(log_mutex);
-    if (DoLog) {
-        log_file << ex << ": " << str << '\n';
+    if (!DoLog) {
+        return;
     }
+    std::string log_line = ex + ": " + str + '\n';
+    log_file << log_line;
+    log_file.flush();
 }
+
 
 void Logger::logInt(const std::string& explaination, int value)
 {
