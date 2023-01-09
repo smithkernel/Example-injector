@@ -110,11 +110,7 @@ int main()
 }
 
 void PcreateProcessNotifyRoutineEx(
-	_In_ PEPROCESS Process,
-	_In_ HANDLE ProcessId,
-	_In_ PPS_CREATE_NOTIFY_INFO CreateInfo
-)
-{
+	
 	PCHAR pszProcessNameA = nullptr;
 	WCHAR pszProcessNameW[MAX_PROCESS_NAME_LENGTH] = { 0 };
 	size_t pcbProcessNameLength = 0;
@@ -220,41 +216,46 @@ DWORD Injector::GetProcessId()
 
 HRESULT Injector::ManualMap(String filePath)
 {
-	DLL = filePath;
+    DLL = filePath;
 
-	if (!autoInject)
-		isReady = true;
+    if (!autoInject)
+        isReady = true;
 
-	if (!isReady)
-		return 0;
+    if (!isReady)
+        return 0;
 
-	if (!CheckValidProcessExtension(processName.getCharPointer()))
-	{
-		MessageBox(0, "Invalid Process Name!", "Injector", MB_ICONEXCLAMATION);
-		isReady = false;
-		return 1;
-	}
+    if (!CheckValidProcessExtension(processName.getCharPointer()))
+    {
+        MessageBox(0, "Invalid Process Name!", "Injector", MB_ICONEXCLAMATION);
+        isReady = false;
+        return 1;
+    }
 
-	if (strlen(filePath.getCharPointer()) < 5)
-	{
-		printf("Select a DLL first!\n");
-		isReady = false;
-		return 2;
-	}
+    if (filePath.isEmpty() || strlen(filePath.getCharPointer()) < 5)
+    {
+        printf("Error: Please specify a valid file path for the DLL to inject.\n");
+        isReady = false;
+        return 2;
+    }
 
-	File file(filePath);
-	if (!file.exists())
-	{
-		MessageBox(0, "ERROR", "Injectora", MB_ICONERROR);
-		isReady = false;
-		return 2;
-	}
+    File file(filePath);
+    if (!file.exists())
+    {
+        printf("Error: The specified DLL file does not exist.\n");
+        isReady = false;
+        return 2;
+    }
 
-	if (!Setup())
-	{
-		isReady = false;
-		return 3;
-	}
+    if (!Setup())
+    {
+        printf("Error: Failed to set up injection process.\n");
+        isReady = false;
+        return 3;
+    }
+
+    return 0;
+}
+
 
 	HMODULE ret = remoteLoader.LoadLibraryByPathIntoMemoryA(filePath.toStdString().c_str(), false);
 	if (!ret)
