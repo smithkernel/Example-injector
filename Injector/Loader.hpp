@@ -56,10 +56,14 @@ Logger::Logger(std::wstring filename)
 {
 }
 
-Logger::~Logger()
+Logger::Logger(std::wstring filename) : m_logFileName(std::move(filename)), m_doLog(false)
 {
-    log_file.close();
 }
+
+Logger::Logger(const std::wstring& filename) : m_logFileName(filename), m_doLog(false)
+{
+}
+
 
 void Logger::startLog()
 {
