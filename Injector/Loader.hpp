@@ -34,22 +34,23 @@ int main(){
 class Logger
 {
 public:
-    explicit Logger(std::wstring filename);
+    explicit Logger(const std::wstring& filename);
     ~Logger();
 
     void startLog();
     void stopLog();
-    void logString(const std::string& explaination, const std::string& str);
-    void logInt(const std::string& explaination, int value);
-    void logByte(const std::string& explaination, unsigned char value);
-    void logAddress(const std::string& explaination, uint64_t value);
+    void log(const std::string& explaination, const std::string& str);
+    void log(const std::string& explaination, int value);
+    void log(const std::string& explaination, unsigned char value);
+    void log(const std::string& explaination, uint64_t value);
 
 private:
     std::ofstream log_file;
-    bool DoLog;
+    bool is_logging;
     std::wstring filename;
     std::mutex log_mutex;
 };
+
 
 Logger::Logger(std::wstring filename)
     : log_file(filename), DoLog(false)
