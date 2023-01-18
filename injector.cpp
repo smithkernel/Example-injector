@@ -40,45 +40,39 @@ private:
 
 
 
-// Returns the process ID of the process with the given name.
-// Returns 0 if the process was not found.
 DWORD get_process_id(const wchar_t* process_name)
 {
-    // Get snapshot of all processes
+    DWORD pid = 0;
+
+    // Create a snapshot of all processes in the system
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (snapshot == INVALID_HANDLE_VALUE)
     {
-        std::cerr << "Failed to create snapshot of processes: " << GetLastError() << std::endl;
-        return 0;
+        std::wcerr << L"Failed to create process snapshot: " << GetLastError() << std::endl;
+        return pid;
     }
 
-    // Initialize process entry structure
-    PROCESSENTRY32W process_entry;
-    ZeroMemory(&process_entry, sizeof(PROCESSENTRY32W));
-    process_entry.dwSize = sizeof(PROCESSENTRY32W);
+    // Make sure to close the snapshot when we're done
+    std::unique_ptr<void, decltype(&CloseHandle)> snapshot_handle(snapshot, &CloseHandle);
 
-    // Iterate through processes
-    if (Process32FirstW(snapshot, &process_entry))
+    // Iterate through all processes
+    PROCESSENTRY32W entry;
+    entry.dwSize = sizeof(PROCESSENTRY32W);
+    if (Process32FirstW(snapshot, &entry))
     {
         do
         {
-            // Check if process name matches
-            if (wcscmp(process_entry.szExeFile, process_name) == 0)
+            // Check if the process name matches the one we're looking for
+            if (wcscmp(entry.szExeFile, process_name) == 0)
             {
-                // Process found
-                CloseHandle(snapshot);
-                return process_entry.th32ProcessID;
+                pid = entry.th32ProcessID;
+                break;
             }
-        } while (Process32NextW(snapshot, &process_entry));
+        } while (Process32NextW(snapshot, &entry));
     }
 
-    // Process not found
-    CloseHandle(snapshot);
-    return 0;
+    return pid;
 }
-
-// Forward declaration of get_process_id function
-DWORD get_process_id(const wchar_t* process_name);
 
 int main()
 {
@@ -91,7 +85,7 @@ int main()
     DWORD pid = get_process_id(process_name);
     if (pid == 0)
     {
-        std::wcerr << "Failed to find process " << process_name << "! Make sure it is running." << std::endl;
+        std::wcerr << L"Failed to find process " << process_name << L"! Make sure it is running." << std::endl;
         return 1;
     }
 
@@ -99,13 +93,13 @@ int main()
     HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
     if (process == nullptr)
     {
-        std::cerr << "Failed to open handle to process: " << GetLastError() << std::endl;
+        std::wcerr << L"Failed to open handle to process " << process_name << L": " << GetLastError() << std::endl;
         return 1;
     }
 
     // Make sure to close the handle when we're done
     std::unique_ptr<void, decltype(&CloseHandle)> process_handle(process, &CloseHandle);
-
+    std::cout << L"Successfully opened handle to process " << process_name << " with ID " << pid << std::endl;
     return 0;
 }
 
