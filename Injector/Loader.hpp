@@ -66,15 +66,16 @@ Logger::Logger(const std::wstring& filename) : m_logFileName(filename), m_doLog(
 }
 
 
-void Logger::startLog()
+void print_params(t_params_struct &p)
 {
-    DoLog = true;
+    std::cout  << "myDec :  [" << std::dec << p.myDec << "] = " << std::hex << "[0x" << p.myDec << "]\n";
+    std::cout  << "myHex :  [" << std::hex << "0x" << p.myHex << "] = [" << std::dec << p.myHex << "]\n";
+    std::cout  << "myBool:  [" << std::dec << p.myBool << "]\n";
+    std::cout  << "myABuf:  [" << p.myABuf << "]\n";
+    std::wcout << "myWBuf:  [" << p.myWBuf << "]\n";
+    std::cout  << "myEnum:  [" << std::dec << p.myEnum << "]\n";
 }
 
-void Logger::stopLog()
-{
-    DoLog = false;
-}
 
 void Logger::logString(const std::string& ex, const std::string& str)
 {
