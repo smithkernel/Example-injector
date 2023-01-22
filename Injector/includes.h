@@ -39,19 +39,36 @@ public:
 	BOOL LoadLibraryInject(String filePath);
 
 private:
-	bool autoInject;
-	bool closeOnInject;
-	bool hasInjected;
-	bool isManualMap;
-	bool isReady;
-	bool canInject;
-	String DLL;
-	Array<int> oldProcessIds;
-	String processName;
-	DWORD processId;
-	HANDLE processHandle;
-	CRemoteLoader remoteLoader;
+    bool m_autoInject;
+    bool m_closeOnInject;
+    bool m_hasInjected;
+    bool m_isManualMap;
+    bool m_isReady;
+    bool m_canInject;
+    std::string m_DLL;
+    std::vector<DWORD> m_oldProcessIds;
+    std::string m_processName;
+    DWORD m_processId;
+    HANDLE m_processHandle;
+    CRemoteLoader m_remoteLoader;
 
-	HMODULE hNtdll;
-	tNTQSI fnQSI;
+    HMODULE m_hNtdll;
+    tNTQSI m_fnQSI;
+
+public:
+    DLLInjector();
+    ~DLLInjector();
+
+    bool Init();
+    bool InjectDLL();
+    bool CloseOnInject();
+    bool HasInjected();
+    bool IsManualMap();
+    bool IsReady();
+    bool CanInject();
+    std::string GetDLLName();
+    std::vector<DWORD> GetOldProcessIds();
+    std::string GetProcessName();
+    DWORD GetProcessId();
+    HANDLE GetProcessHandle();
 };
