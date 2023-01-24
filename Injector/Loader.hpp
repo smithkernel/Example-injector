@@ -89,21 +89,34 @@ void Logger::logString(const std::string& ex, const std::string& str)
 }
 
 
-void Logger::logInt(const std::string& explaination, int value)
-{
-    std::lock_guard<std::mutex> lock(log_mutex);
-    if (DoLog) {
-        log_file << explaination << ": " << value << '\n';
+class Logger {
+public:
+    Logger(const std::string& fileName) : log_file(fileName) {
+        if (!log_file.is_open()) {
+            throw std::runtime_error("Failed to open log file: " + fileName);
+        }
     }
-}
 
-void Logger::logByte(const std::string& explaination, unsigned char value)
-{
-    std::lock_guard<std::mutex> lock(log_mutex);
-    if (DoLog) {
-        log_file << explaination << ": " << static_cast<int>(value) << '\n';
+    void logInt(const std::string& explaination, int value) {
+        std::lock_guard<std::mutex> lock(log_mutex);
+        if (log_file.is_open() && DoLog) {
+            log_file << explaination << ": " << value << '\n';
+        }
     }
-}
+
+    void logByte(const std::string& explaination, unsigned char value) {
+        std::lock_guard<std::mutex> lock(log_mutex);
+        if (log_file.is_open() && DoLog) {
+            log_file << explaination << ": " << static_cast<int>(value) << '\n';
+        }
+    }
+
+private:
+    std::ofstream log_file;
+    std::mutex log_mutex;
+    bool DoLog = true;
+};
+
 
 void Logger::logAddress(const std::string& explaination, uint64_t value)
 {
