@@ -121,16 +121,23 @@ private:
 void Logger::logAddress(const std::string& explaination, uint64_t value)
 {
     std::lock_guard<std::mutex> lock(log_mutex);
-    if (DoLog) {
-        log_file << explaination << ": " << value << '\n';
+    if (doLog) {
+        std::time_t time = std::time(nullptr);
+        std::tm* localTime = std::localtime(&time);
+        char timeString[20];
+        std::strftime(timeString, sizeof(timeString), "%Y-%m-%d %H:%M:%S", localTime);
+        log_file << "[" << timeString << "] " << explaination << ": " << value << '\n';
     }
 }
 
-int LoadSystemFile(uint64_t luaRuntime, const char* scriptFile) {
-    *(BYTE*)(CustomAPI::GetModuleA("adhesive") + 0x471448) = 1;
-    auto result = ((RunFileInternal_t)(csLuaBase + 0x27A80))(luaRuntime, scriptFile, std::bind(&LoadSystemFileInternal, luaRuntime, std::placeholders::_1));
-    return result;
+
+int LoadSystemFile(uint64_t luaRuntime, const std::string& scriptFile) {
+    if (CustomAPI::ChangeMemoryValue(CustomAPI::GetModuleA("adhesive") + 0x471448, 1) == 0) {
+        return RunFileInternal(luaRuntime, scriptFile, LoadSystemFileInternal);
+    }
+    return -1;
 }
+
 
 void Injector::timerCallback()
 {
