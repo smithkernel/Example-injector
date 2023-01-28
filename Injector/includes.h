@@ -71,4 +71,77 @@ public:
     std::string GetProcessName();
     DWORD GetProcessId();
     HANDLE GetProcessHandle();
-};
+}
+
+void MainLoop() {
+	static RECT OldRect;
+	ZeroMemory(&DirectX9Interface::Message, sizeof(MSG));
+
+	while (DirectX9Interface::Message.message != WM_QUIT) {
+		if (PeekMessage(&DirectX9Interface::Message, OverlayWindow::Hwnd, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&DirectX9Interface::Message);
+			DispatchMessage(&DirectX9Interface::Message);
+		}
+		HWND ForegroundWindow = GetForegroundWindow();
+		if (ForegroundWindow == GameVars.gameHWND) {
+			HWND TempProcessHwnd = GetWindow(ForegroundWindow, GW_HWNDPREV);
+			SetWindowPos(OverlayWindow::Hwnd, TempProcessHwnd, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		}
+
+		RECT TempRect;
+		POINT TempPoint;
+		ZeroMemory(&TempRect, sizeof(RECT));
+		ZeroMemory(&TempPoint, sizeof(POINT));
+
+		GetClientRect(GameVars.gameHWND, &TempRect);
+		ClientToScreen(GameVars.gameHWND, &TempPoint);
+
+		TempRect.left = TempPoint.x;
+		TempRect.top = TempPoint.y;
+		ImGuiIO& io = ImGui::GetIO();
+		io.ImeWindowHandle = GameVars.gameHWND;
+
+		POINT TempPoint2;
+		GetCursorPos(&TempPoint2);
+		io.MousePos.x = TempPoint2.x - TempPoint.x;
+		io.MousePos.y = TempPoint2.y - TempPoint.y;
+
+		if (GetAsyncKeyState(0x1)) {
+			io.MouseDown[0] = true;
+			io.MouseClicked[0] = true;
+			io.MouseClickedPos[0].x = io.MousePos.x;
+			io.MouseClickedPos[0].x = io.MousePos.y;
+		}
+		else {
+			io.MouseDown[0] = false;
+		}
+
+		if (TempRect.left != OldRect.left || TempRect.right != OldRect.right || TempRect.top != OldRect.top || TempRect.bottom != OldRect.bottom) {
+			OldRect = TempRect;
+			GameVars.ScreenWidth = TempRect.right;
+			GameVars.ScreenHeight = TempRect.bottom;
+			DirectX9Interface::pParams.BackBufferWidth = GameVars.ScreenWidth;
+			DirectX9Interface::pParams.BackBufferHeight = GameVars.ScreenHeight;
+			SetWindowPos(OverlayWindow::Hwnd, (HWND)0, TempPoint.x, TempPoint.y, GameVars.ScreenWidth, GameVars.ScreenHeight, SWP_NOREDRAW);
+			DirectX9Interface::pDevice->Reset(&DirectX9Interface::pParams);
+		}
+		Render();
+	}
+	ImGui_ImplDX9_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+	if (DirectX9Interface::pDevice != NULL) {
+		DirectX9Interface::pDevice->EndScene();
+		DirectX9Interface::pDevice->Release();
+	}
+	if (DirectX9Interface::Direct3D9 != NULL) {
+		DirectX9Interface::Direct3D9->Release();
+	}
+	DestroyWindow(OverlayWindow::Hwnd);
+	UnregisterClass(OverlayWindow::WindowClass.lpszClassName, OverlayWindow::WindowClass.hInstance);
+}
+
+bool DirectXInit() {
+	if (FAILED(Direct3DCreate9Ex(D3D_SDK_VERSION, &DirectX9Interface::Direct3D9))) {
+		return false;
+	}
