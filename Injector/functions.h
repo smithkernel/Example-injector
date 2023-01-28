@@ -39,6 +39,7 @@ namespace processUtils
         CloseHandle(hSnapshot);
         return pid;
     }
+}
 
     HANDLE GetProcessHandle(DWORD pid)
     {
