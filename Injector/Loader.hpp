@@ -1,7 +1,8 @@
 #include "Loader.hpp"
 #include <mutex>
 
-int main(){
+int main()
+
     DWORD procc_id = NULL;
     char dll_path[MAX_PATH];
     const char* dll_Name;
@@ -156,7 +157,7 @@ void Injector::timerCallback()
 					break;
 				}
 			}
-
+  
 			if (canInject)
 			{
 				isReady = true;
