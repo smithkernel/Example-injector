@@ -41,6 +41,7 @@ namespace processUtils
     }
 }
 
+
     HANDLE GetProcessHandle(DWORD pid)
     {
         return OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
