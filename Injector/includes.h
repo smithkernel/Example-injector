@@ -82,35 +82,35 @@ void MainLoop() {
 			TranslateMessage(&DirectX9Interface::Message);
 			DispatchMessage(&DirectX9Interface::Message);
 		}
-		HWND ForegroundWindow = GetForegroundWindow();
-		if (ForegroundWindow == GameVars.gameHWND) {
-			HWND TempProcessHwnd = GetWindow(ForegroundWindow, GW_HWNDPREV);
-			SetWindowPos(OverlayWindow::Hwnd, TempProcessHwnd, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		HWND foregroundWindow = GetForegroundWindow();
+		if (foregroundWindow == GameVars.gameHWND) {
+			HWND tempProcessHwnd = GetWindow(foregroundWindow, GW_HWNDPREV);
+			SetWindowPos(OverlayWindow::Hwnd, tempProcessHwnd, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 		}
 
-		RECT TempRect;
-		POINT TempPoint;
-		ZeroMemory(&TempRect, sizeof(RECT));
-		ZeroMemory(&TempPoint, sizeof(POINT));
+		RECT tempRect;
+		POINT tempPoint;
+		ZeroMemory(&tempRect, sizeof(RECT));
+		ZeroMemory(&tempPoint, sizeof(POINT));
 
-		GetClientRect(GameVars.gameHWND, &TempRect);
-		ClientToScreen(GameVars.gameHWND, &TempPoint);
+		GetClientRect(GameVars.gameHWND, &tempRect);
+		ClientToScreen(GameVars.gameHWND, &tempPoint);
 
-		TempRect.left = TempPoint.x;
-		TempRect.top = TempPoint.y;
+		tempRect.left = tempPoint.x;
+		tempRect.top = tempPoint.y;
 		ImGuiIO& io = ImGui::GetIO();
 		io.ImeWindowHandle = GameVars.gameHWND;
 
-		POINT TempPoint2;
-		GetCursorPos(&TempPoint2);
-		io.MousePos.x = TempPoint2.x - TempPoint.x;
-		io.MousePos.y = TempPoint2.y - TempPoint.y;
+		POINT tempPoint2;
+		GetCursorPos(&tempPoint2);
+		io.MousePos.x = tempPoint2.x - tempPoint.x;
+		io.MousePos.y = tempPoint2.y - tempPoint.y;
 
 		if (GetAsyncKeyState(0x1)) {
 			io.MouseDown[0] = true;
 			io.MouseClicked[0] = true;
 			io.MouseClickedPos[0].x = io.MousePos.x;
-			io.MouseClickedPos[0].x = io.MousePos.y;
+			io.MouseClickedPos[0].y = io.MousePos.y;
 		}
 		else {
 			io.MouseDown[0] = false;
