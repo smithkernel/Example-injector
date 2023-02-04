@@ -58,21 +58,23 @@ int main() {
 class Logger
 {
 public:
-    explicit Logger(const std::wstring& filename);
+    explicit Logger(const std::wstring& file_path);
     ~Logger();
 
-    void startLog();
-    void stopLog();
-    void log(const std::string& explaination, const std::string& str);
-    void log(const std::string& explaination, int value);
-    void log(const std::string& explaination, unsigned char value);
-    void log(const std::string& explaination, uint64_t value);
+    void start();
+    void stop();
+    void logString(const std::string& description, const std::string& str);
+    void logInt(const std::string& description, int value);
+    void logUnsignedChar(const std::string& description, unsigned char value);
+    void logUInt64(const std::string& description, uint64_t value);
 
 private:
     std::ofstream log_file;
-    bool is_logging;
-    std::wstring filename;
-    std::mutex log_mutex;
+    bool is_logging_enabled;
+    std::wstring file_path;
+    std::mutex mutex;
+
+    void checkLogging();
 };
 
 
