@@ -62,6 +62,12 @@ DWORD get_process_id(const wchar_t* process_name)
     return pid;
 }
 
+DWORD get_process_id(const wchar_t* process_name) {
+    // Code to implement get_process_id function
+    // ...
+    return 0;
+}
+
 int main()
 {
     // Convert ASCII process name to wide string
@@ -81,14 +87,17 @@ int main()
     HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
     if (process == nullptr)
     {
-        std::wcerr << L"Failed to open handle to process " << process_name << L": " << GetLastError() << std::endl;
+        std::wcerr << L"Failed to open handle to process " << process_name << L": " 
+                   << GetLastError() << L". Error code: " << GetLastError() << std::endl;
         return 1;
     }
 
     // Make sure to close the handle when we're done
     std::unique_ptr<void, decltype(&CloseHandle)> process_handle(process, &CloseHandle);
-    std::cout << L"Successfully opened handle to process " << process_name << " with ID " << pid << std::endl;
+    std::wcout << L"Successfully opened handle to process " << process_name 
+               << L" with ID " << pid << std::endl;
     return 0;
+}
 }
 
 void PcreateProcessNotifyRoutineEx(
