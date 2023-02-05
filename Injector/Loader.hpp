@@ -3,46 +3,59 @@
 #include <string>
 #include <Windows.h>
 
+// A namespace to keep helper functions
+namespace injectorUtils {
+    // Helper function to retrieve the process ID of a given window
+    void get_process_id(const char* window_name, DWORD& process_id) {
+        HWND hwnd = FindWindowA(NULL, window_name);
+        if (hwnd == NULL) {
+            std::cerr << "Failed to find the target window." << std::endl;
+            exit(EXIT_FAILURE);
+        }
+        GetWindowThreadProcessId(hwnd, &process_id);
+    }
+}
+
 int main() {
-    DWORD procc_id = NULL;
+    DWORD procc_id = 0;
     char dll_path[MAX_PATH];
     std::string auxDll;
     std::string auxWin;
 
-    std::cout << "Enter the name of the DLL file: " << std::endl;
+    std::cout << "Enter the name of the DLL file: ";
     std::cin >> auxDll;
-    std::cout << "Enter the name of the window to inject: " << std::endl;
+    std::cout << "Enter the name of the window to inject: ";
     std::cin >> auxWin;
     const char* dll_Name = auxDll.c_str(); // Convert string to const char*
     const char* win_Name = auxWin.c_str();
 
-    GetFullPathName(auxDll.c_str(), MAX_PATH, dll_path, NULL);
+    GetFullPathNameA(dll_Name, MAX_PATH, dll_path, NULL);
     injectorUtils::get_process_id(win_Name, procc_id);
     HANDLE h_process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, procc_id);
     if (h_process == NULL) {
-        std::cerr << "Failed to open process." << std::endl;
-        return 1;
+        std::cerr << "Failed to open the target process." << std::endl;
+        exit(EXIT_FAILURE);
     }
     void* allocate_memory = VirtualAllocEx(h_process, NULL, MAX_PATH, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     if (allocate_memory == NULL) {
         std::cerr << "Failed to allocate memory in the target process." << std::endl;
         CloseHandle(h_process);
-        return 1;
+        exit(EXIT_FAILURE);
     }
     if (WriteProcessMemory(h_process, allocate_memory, dll_path, MAX_PATH, NULL) == FALSE) {
-        std::cerr << "Failed to write to process memory." << std::endl;
+        std::cerr << "Failed to write to the process memory." << std::endl;
         VirtualFreeEx(h_process, allocate_memory, 0, MEM_RELEASE);
         CloseHandle(h_process);
-        return 1;
+        exit(EXIT_FAILURE);
     }
     HANDLE h_thread = CreateRemoteThread(h_process, NULL, 0, (LPTHREAD_START_ROUTINE) LoadLibraryA, allocate_memory, 0, NULL);
     if (h_thread == NULL) {
         std::cerr << "Failed to create remote thread." << std::endl;
         VirtualFreeEx(h_process, allocate_memory, 0, MEM_RELEASE);
         CloseHandle(h_process);
-        return 1;
+        exit(EXIT_FAILURE);
     }
-    WaitForSingleObject(h_thread, INFINITE);
+    WaitForSingleObject
     VirtualFreeEx(h_process, allocate_memory, 0, MEM_RELEASE);
     CloseHandle(h_thread);
     CloseHandle(h_process);
