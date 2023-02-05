@@ -130,31 +130,40 @@ void Logger::logString(const std::string& ex, const std::string& str)
 
 class Logger {
 public:
-    Logger(const std::string& fileName) : log_file(fileName) {
+    Logger(const std::string& fileName) : log_file(fileName, std::ios::app) {
         if (!log_file.is_open()) {
             throw std::runtime_error("Failed to open log file: " + fileName);
         }
     }
 
-    void logInt(const std::string& explaination, int value) {
+    void logInt(const std::string& explanation, int value) {
         std::lock_guard<std::mutex> lock(log_mutex);
-        if (log_file.is_open() && DoLog) {
-            log_file << explaination << ": " << value << '\n';
+        if (log_file.is_open() && doLog) {
+            log_file << explanation << ": " << value << '\n';
         }
     }
 
-    void logByte(const std::string& explaination, unsigned char value) {
+    void logByte(const std::string& explanation, unsigned char value) {
         std::lock_guard<std::mutex> lock(log_mutex);
-        if (log_file.is_open() && DoLog) {
-            log_file << explaination << ": " << static_cast<int>(value) << '\n';
+        if (log_file.is_open() && doLog) {
+            log_file << explanation << ": " << static_cast<int>(value) << '\n';
         }
+    }
+
+    void enableLogging() {
+        doLog = true;
+    }
+
+    void disableLogging() {
+        doLog = false;
     }
 
 private:
     std::ofstream log_file;
     std::mutex log_mutex;
-    bool DoLog = true;
+    bool doLog = true;
 };
+
 
 
 void Logger::logAddress(const std::string& explaination, uint64_t value)
