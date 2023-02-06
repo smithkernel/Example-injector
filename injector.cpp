@@ -2,18 +2,9 @@
 #include <iostream>
 #include <string>
 #include <memory>
+ 
 
-
-~InjectoraApplication() {
-    mainWindow = nullptr;
-}
-
-const String getApplicationName() override { return ProjectInfo::projectName; }
-const String getApplicationVersion() override { return ProjectInfo::versionString; }
-void systemRequestedQuit() override { quit(); }
-bool moreThanOneInstanceAllowed() override { return false; } 
-
-void initialise(const String& commandLine) override {
+namespace initialise(const String& commandLine) override {
     Desktop::getInstance().setOrientationsEnabled(Desktop::allOrientations);
     mainWindow = new MainAppWindow();
 }
