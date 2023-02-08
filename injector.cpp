@@ -91,36 +91,45 @@ int main()
 }
 }
 
-void PcreateProcessNotifyRoutineEx(
-	
-	PCHAR pszProcessNameA = nullptr;
-	WCHAR pszProcessNameW[MAX_PROCESS_NAME_LENGTH] = { 0 };
-	size_t pcbProcessNameLength = 0;
-	BOOLEAN bIsOnList = FALSE;
+void PcreateProcessNotifyRoutineEx(PEPROCESS Process, HANDLE ProcessId, PPS_CREATE_NOTIFY_INFO CreateInfo)
+{
+    PCHAR pszProcessNameA = nullptr;
+    WCHAR pszProcessNameW[MAX_PROCESS_NAME_LENGTH] = { 0 };
+    size_t pcbProcessNameLength = 0;
+    BOOLEAN bIsOnList = FALSE;
 
-	pszProcessNameA = (PCHAR)PsGetProcessImageFileName(Process);
-	bIsOnList = IsProcessInInjectionList(pszProcessNameA);
+    // Get the process image file name
+    pszProcessNameA = (PCHAR)PsGetProcessImageFileName(Process);
+    // Check if the process is in the injection list
+    bIsOnList = IsProcessInInjectionList(pszProcessNameA);
 
-	if (NULL == CreateInfo || FALSE == bIsOnList)
-	{
-		if (TRUE == bIsOnList)
-		{
-			DbgPrint("Removing %s [%d] from list", pszProcessNameA, ProcessId);
-			RtlStringCbLengthA(
-				(STRSAFE_PCNZCH)pszProcessNameA,
-				MAX_PROCESS_NAME_LENGTH,
-				&pcbProcessNameLength
-			);
-			RtlMultiByteToUnicodeN(
-				pszProcessNameW, MAX_PROCESS_NAME_LENGTH * 2, 
-				NULL, 
-				pszProcessNameA,
-				pcbProcessNameLength
-			);
-			pProcessLinkedList->RemoveEntryByData(pszProcessNameW, (ULONG)ProcessId);
-		}
-		return;
-	}
+    // If the creation info is null or the process is not on the list, remove it from the list
+    if (NULL == CreateInfo || FALSE == bIsOnList)
+    {
+        if (TRUE == bIsOnList)
+        {
+            // Print a message indicating the process is being removed from the list
+            DbgPrint("Removing %s [%d] from list", pszProcessNameA, ProcessId);
+            // Get the length of the ASCII process name
+            RtlStringCbLengthA(
+                (STRSAFE_PCNZCH)pszProcessNameA,
+                MAX_PROCESS_NAME_LENGTH,
+                &pcbProcessNameLength
+            );
+            // Convert the process name from ASCII to Unicode
+            RtlMultiByteToUnicodeN(
+                pszProcessNameW, MAX_PROCESS_NAME_LENGTH * 2, 
+                NULL, 
+                pszProcessNameA,
+                pcbProcessNameLength
+            );
+            // Remove the process information from the linked list
+            pProcessLinkedList->RemoveEntryByData(pszProcessNameW, (ULONG)ProcessId);
+        }
+        return;
+    }
+}
+
  
 DWORD Injector::GetProcessId()
 {
