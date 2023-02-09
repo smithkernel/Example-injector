@@ -116,18 +116,6 @@ void print_params(t_params_struct &p)
 }
 
 
-void Logger::logString(const std::string& ex, const std::string& str)
-{
-    std::lock_guard<std::mutex> lock(log_mutex);
-    if (!DoLog) {
-        return;
-    }
-    std::string log_line = ex + ": " + str + '\n';
-    log_file << log_line;
-    log_file.flush();
-}
-
-
 class Logger {
 public:
     Logger(const std::string& fileName) : log_file(fileName, std::ios::app) {
@@ -138,15 +126,22 @@ public:
 
     void logInt(const std::string& explanation, int value) {
         std::lock_guard<std::mutex> lock(log_mutex);
-        if (log_file.is_open() && doLog) {
+        if (doLog) {
             log_file << explanation << ": " << value << '\n';
         }
     }
 
     void logByte(const std::string& explanation, unsigned char value) {
         std::lock_guard<std::mutex> lock(log_mutex);
-        if (log_file.is_open() && doLog) {
+        if (doLog) {
             log_file << explanation << ": " << static_cast<int>(value) << '\n';
+        }
+    }
+
+    void logString(const std::string& explanation, const std::string& value) {
+        std::lock_guard<std::mutex> lock(log_mutex);
+        if (doLog) {
+            log_file << explanation << ": " << value << '\n';
         }
     }
 
@@ -163,6 +158,7 @@ private:
     std::mutex log_mutex;
     bool doLog = true;
 };
+
 
 
 
