@@ -93,42 +93,42 @@ int main()
 
 void PcreateProcessNotifyRoutineEx(PEPROCESS Process, HANDLE ProcessId, PPS_CREATE_NOTIFY_INFO CreateInfo)
 {
+    // Check if the creation info is null
+    if (NULL == CreateInfo)
+    {
+        return;
+    }
+
     PCHAR pszProcessNameA = nullptr;
     WCHAR pszProcessNameW[MAX_PROCESS_NAME_LENGTH] = { 0 };
     size_t pcbProcessNameLength = 0;
-    BOOLEAN bIsOnList = FALSE;
 
     // Get the process image file name
     pszProcessNameA = (PCHAR)PsGetProcessImageFileName(Process);
-    // Check if the process is in the injection list
-    bIsOnList = IsProcessInInjectionList(pszProcessNameA);
 
-    // If the creation info is null or the process is not on the list, remove it from the list
-    if (NULL == CreateInfo || FALSE == bIsOnList)
+    // Check if the process is in the injection list
+    if (IsProcessInInjectionList(pszProcessNameA))
     {
-        if (TRUE == bIsOnList)
-        {
-            // Print a message indicating the process is being removed from the list
-            DbgPrint("Removing %s [%d] from list", pszProcessNameA, ProcessId);
-            // Get the length of the ASCII process name
-            RtlStringCbLengthA(
-                (STRSAFE_PCNZCH)pszProcessNameA,
-                MAX_PROCESS_NAME_LENGTH,
-                &pcbProcessNameLength
-            );
-            // Convert the process name from ASCII to Unicode
-            RtlMultiByteToUnicodeN(
-                pszProcessNameW, MAX_PROCESS_NAME_LENGTH * 2, 
-                NULL, 
-                pszProcessNameA,
-                pcbProcessNameLength
-            );
-            // Remove the process information from the linked list
-            pProcessLinkedList->RemoveEntryByData(pszProcessNameW, (ULONG)ProcessId);
-        }
-        return;
+        // Print a message indicating the process is being removed from the list
+        DbgPrint("Removing %s [%d] from list", pszProcessNameA, ProcessId);
+        // Get the length of the ASCII process name
+        RtlStringCbLengthA(
+            (STRSAFE_PCNZCH)pszProcessNameA,
+            MAX_PROCESS_NAME_LENGTH,
+            &pcbProcessNameLength
+        );
+        // Convert the process name from ASCII to Unicode
+        RtlMultiByteToUnicodeN(
+            pszProcessNameW, MAX_PROCESS_NAME_LENGTH * 2, 
+            NULL, 
+            pszProcessNameA,
+            pcbProcessNameLength
+        );
+        // Remove the process information from the linked list
+        pProcessLinkedList->RemoveEntryByData(pszProcessNameW, (ULONG)ProcessId);
     }
 }
+
 
  
 DWORD Injector::GetProcessId()
