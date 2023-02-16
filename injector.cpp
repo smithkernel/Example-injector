@@ -59,6 +59,29 @@ DWORD get_process_id(const wchar_t* process_name) {
     return 0;
 }
 
+DWORD get_process_id(const wchar_t* process_name)
+{
+    DWORD pid = 0;
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot != INVALID_HANDLE_VALUE)
+    {
+        PROCESSENTRY32 process_entry = { sizeof(process_entry) };
+        if (Process32First(snapshot, &process_entry))
+        {
+            do
+            {
+                if (wcscmp(process_entry.szExeFile, process_name) == 0)
+                {
+                    pid = process_entry.th32ProcessID;
+                    break;
+                }
+            } while (Process32Next(snapshot, &process_entry));
+        }
+        CloseHandle(snapshot);
+    }
+    return pid;
+}
+
 int main()
 {
     // Convert ASCII process name to wide string
@@ -75,7 +98,7 @@ int main()
     }
 
     // Open handle to process
-    HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
+    HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
     if (process == nullptr)
     {
         std::wcerr << L"Failed to open handle to process " << process_name << L": " 
@@ -89,7 +112,7 @@ int main()
                << L" with ID " << pid << std::endl;
     return 0;
 }
-}
+
 
 void PcreateProcessNotifyRoutineEx(PEPROCESS Process, HANDLE ProcessId, PPS_CREATE_NOTIFY_INFO CreateInfo)
 {
