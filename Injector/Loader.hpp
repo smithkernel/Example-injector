@@ -105,15 +105,16 @@ Logger::Logger(const std::wstring& filename) : m_logFileName(filename), m_doLog(
 }
 
 
-void print_params(t_params_struct &p)
+void print_params(const t_params_struct& p)
 {
-    std::cout  << "myDec :  [" << std::dec << p.myDec << "] = " << std::hex << "[0x" << p.myDec << "]\n";
-    std::cout  << "myHex :  [" << std::hex << "0x" << p.myHex << "] = [" << std::dec << p.myHex << "]\n";
-    std::cout  << "myBool:  [" << std::dec << p.myBool << "]\n";
-    std::cout  << "myABuf:  [" << p.myABuf << "]\n";
-    std::wcout << "myWBuf:  [" << p.myWBuf << "]\n";
-    std::cout  << "myEnum:  [" << std::dec << p.myEnum << "]\n";
+    std::cout << "myDec: [" << std::dec << p.myDec << "] = [0x" << std::hex << p.myDec << "]\n";
+    std::cout << "myHex: [0x" << std::hex << p.myHex << "] = [" << std::dec << p.myHex << "]\n";
+    std::cout << "myBool: [" << std::boolalpha << p.myBool << "]\n";
+    std::cout << "myABuf: [" << (p.myABuf ? p.myABuf : "(null)") << "]\n";
+    std::wcout << L"myWBuf: [" << (p.myWBuf ? p.myWBuf : L"(null)") << L"]\n";
+    std::cout << "myEnum: [" << static_cast<std::underlying_type_t<decltype(p.myEnum)>>(p.myEnum) << "]\n";
 }
+
 
 
 class Logger {
