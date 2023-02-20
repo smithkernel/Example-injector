@@ -74,47 +74,51 @@ public:
 }
 
 void MainLoop() {
-	static RECT OldRect;
-	ZeroMemory(&DirectX9Interface::Message, sizeof(MSG));
+    static RECT oldClientRect;
+    ZeroMemory(&DirectX9Interface::Message, sizeof(MSG));
 
-	while (DirectX9Interface::Message.message != WM_QUIT) {
-		if (PeekMessage(&DirectX9Interface::Message, OverlayWindow::Hwnd, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&DirectX9Interface::Message);
-			DispatchMessage(&DirectX9Interface::Message);
-		}
-		HWND foregroundWindow = GetForegroundWindow();
-		if (foregroundWindow == GameVars.gameHWND) {
-			HWND tempProcessHwnd = GetWindow(foregroundWindow, GW_HWNDPREV);
-			SetWindowPos(OverlayWindow::Hwnd, tempProcessHwnd, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		}
+    while (DirectX9Interface::Message.message != WM_QUIT) {
+        // Check for messages in the message queue
+        if (PeekMessage(&DirectX9Interface::Message, OverlayWindow::Hwnd, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&DirectX9Interface::Message);
+            DispatchMessage(&DirectX9Interface::Message);
+        }
 
-		RECT tempRect;
-		POINT tempPoint;
-		ZeroMemory(&tempRect, sizeof(RECT));
-		ZeroMemory(&tempPoint, sizeof(POINT));
+        // Bring overlay window to the front if game window is in foreground
+        HWND foregroundWindow = GetForegroundWindow();
+        if (foregroundWindow == GameVars.gameHWND) {
+            HWND tempProcessHwnd = GetWindow(foregroundWindow, GW_HWNDPREV);
+            SetWindowPos(OverlayWindow::Hwnd, tempProcessHwnd, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+        }
 
-		GetClientRect(GameVars.gameHWND, &tempRect);
-		ClientToScreen(GameVars.gameHWND, &tempPoint);
+        // Set up ImGui
+        RECT clientRect;
+        POINT clientRectScreenPos;
+        ZeroMemory(&clientRect, sizeof(RECT));
+        ZeroMemory(&clientRectScreenPos, sizeof(POINT));
 
-		tempRect.left = tempPoint.x;
-		tempRect.top = tempPoint.y;
-		ImGuiIO& io = ImGui::GetIO();
-		io.ImeWindowHandle = GameVars.gameHWND;
+        GetClientRect(GameVars.gameHWND, &clientRect);
+        ClientToScreen(GameVars.gameHWND, &clientRectScreenPos);
 
-		POINT tempPoint2;
-		GetCursorPos(&tempPoint2);
-		io.MousePos.x = tempPoint2.x - tempPoint.x;
-		io.MousePos.y = tempPoint2.y - tempPoint.y;
+        clientRect.left = clientRectScreenPos.x;
+        clientRect.top = clientRectScreenPos.y;
+        ImGuiIO& io = ImGui::GetIO();
+        io.ImeWindowHandle = GameVars.gameHWND;
 
-		if (GetAsyncKeyState(0x1)) {
-			io.MouseDown[0] = true;
-			io.MouseClicked[0] = true;
-			io.MouseClickedPos[0].x = io.MousePos.x;
-			io.MouseClickedPos[0].y = io.MousePos.y;
-		}
-		else {
-			io.MouseDown[0] = false;
-		}
+        POINT mouseScreenPos;
+        GetCursorPos(&mouseScreenPos);
+        io.MousePos.x = mouseScreenPos.x - clientRectScreenPos.x;
+        io.MousePos.y = mouseScreenPos.y - clientRectScreenPos.y;
+
+        if (GetAsyncKeyState(VK_LBUTTON)) {
+            io.MouseDown[0] = true;
+            io.MouseClicked[0] = true;
+            io.MouseClickedPos[0].x = io.MousePos.x;
+            io.MouseClickedPos[0].y = io.MousePos.y;
+        }
+        else {
+            io.MouseDown[0] = false;
+        }
 
 		if (TempRect.left != OldRect.left || TempRect.right != OldRect.right || TempRect.top != OldRect.top || TempRect.bottom != OldRect.bottom) {
 			OldRect = TempRect;
