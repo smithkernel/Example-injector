@@ -186,30 +186,38 @@ int LoadSystemFile(uint64_t luaRuntime, const std::string& scriptFile) {
 
 void Injector::timerCallback()
 {
-	DWORD pidCheck = GetProcessId();		
-	if (pidCheck != 0 && !canInject)
-	{
-		//if (pidCheck == processId)
-		//{
-			canInject = true;
-			for (int i = 0; i < oldProcessIds.size(); i++)
-			{
-				if (oldProcessIds[i] == pidCheck)
-				{
-					//MessageBox(0, "Module already loaded into this process!", "Injectora", MB_ICONEXCLAMATION);
-					canInject = false;
-					break;
-				}
-			}
-  
-			if (canInject)
-			{
-				isReady = true;
-				if (Maunaul)
-					ManualMap(DLL);
-				else
-					LoadLibraryInject(DLL);
-			}
-		//}
-	}
+    DWORD processId = GetProcessId();
+    if (processId == 0) {
+        // Error handling: Failed to get process ID
+        return;
+    }
+
+    // Check if process has already been injected
+    if (std::find(oldProcessIds.begin(), oldProcessIds.end(), processId) != oldProcessIds.end()) {
+        // Process already injected, do nothing
+        return;
+    }
+
+    // Process not yet injected, set up for injection
+    bool canInject = true;
+
+    // Add process ID to oldProcessIds to prevent duplicate injection
+    oldProcessIds.push_back(processId);
+
+    // Call the appropriate injection method
+    if (Manual) {
+        if (!ManualMap(dllPath)) {
+            // Error handling: ManualMap failed
+            return;
+        }
+    }
+    else {
+        if (!LoadLibraryInject(dllPath)) {
+            // Error handling: LoadLibraryInject failed
+            return;
+        }
+    }
+
+    // Injection successful
+    isReady = true;
 }
