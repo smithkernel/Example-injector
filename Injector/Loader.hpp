@@ -199,25 +199,24 @@ void Injector::timerCallback()
     }
 
     // Process not yet injected, set up for injection
-    bool canInject = true;
-
-    // Add process ID to oldProcessIds to prevent duplicate injection
     oldProcessIds.push_back(processId);
 
     // Call the appropriate injection method
+    bool injectionSuccess = false;
     if (Manual) {
-        if (!ManualMap(dllPath)) {
-            // Error handling: ManualMap failed
-            return;
-        }
+        injectionSuccess = ManualMap(dllPath);
     }
     else {
-        if (!LoadLibraryInject(dllPath)) {
-            // Error handling: LoadLibraryInject failed
-            return;
-        }
+        injectionSuccess = LoadLibraryInject(dllPath);
+    }
+
+    // Check if injection was successful
+    if (!injectionSuccess) {
+        // Error handling: Injection failed
+        return;
     }
 
     // Injection successful
     isReady = true;
 }
+
