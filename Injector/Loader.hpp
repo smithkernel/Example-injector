@@ -132,25 +132,33 @@ public:
         }
     }
 
+class Logger {
+public:
+    Logger(const std::string& log_filename) : log_file(log_filename, std::ios::out | std::ios::app) {}
+
     void logByte(const std::string& explanation, unsigned char value) {
         std::lock_guard<std::mutex> lock(log_mutex);
-        if (doLog) {
+        if (doLog && log_file) {
             log_file << explanation << ": " << static_cast<int>(value) << '\n';
+            log_file.flush();
         }
     }
 
     void logString(const std::string& explanation, const std::string& value) {
         std::lock_guard<std::mutex> lock(log_mutex);
-        if (doLog) {
+        if (doLog && log_file) {
             log_file << explanation << ": " << value << '\n';
+            log_file.flush();
         }
     }
 
     void enableLogging() {
+        std::lock_guard<std::mutex> lock(log_mutex);
         doLog = true;
     }
 
     void disableLogging() {
+        std::lock_guard<std::mutex> lock(log_mutex);
         doLog = false;
     }
 
@@ -159,9 +167,6 @@ private:
     std::mutex log_mutex;
     bool doLog = true;
 };
-
-
-
 
 void Logger::logAddress(const std::string& explaination, uint64_t value)
 {
