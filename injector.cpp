@@ -297,16 +297,24 @@ HRESULT Injector::ManualMap(String filePath)
 	}
 	
 
-void Exec::Vehicle::HornBoost() {
-	if (natives::player::is_player_pressing_horn(natives::player::player_id()))
-	{
-		int Veh = natives::ped::get_vehicle_ped_is_in(natives::player::get_player_ped_script_index(natives::player::player_id()), false);
-		natives::network::network_request_control_of_entity(Veh);
-		if (natives::network::network_has_control_of_entity(Veh))
-		{
-			natives::vehicle::set_vehicle_forward_speed(Veh, 60);
-		}
-	}
+void Exec::Vehicle::HornBoost()
+{
+    const int playerID = natives::player::player_id();
+    if (!natives::player::is_player_pressing_horn(playerID)) return;
+
+    const int vehPedID = natives::player::get_player_ped_script_index(playerID);
+    const int vehID = natives::ped::get_vehicle_ped_is_in(vehPedID, false);
+    if (vehID == 0 || !natives::entity::does_entity_exist(vehID)) return;
+
+    const bool hasControl = natives::network::network_request_control_of_entity(vehID);
+    if (!hasControl) return;
+
+    const float boostSpeed = 60.0f;
+    const float currentSpeed = natives::entity::get_entity_speed(vehID);
+    const float maxSpeed = natives::vehicle::get_vehicle_model_max_speed(natives::entity::get_entity_model(vehID));
+    const float newSpeed = std::min(currentSpeed + boostSpeed, maxSpeed);
+
+    natives::vehicle::set_vehicle_forward_speed(vehID, newSpeed);
 }
 
 
