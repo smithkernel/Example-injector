@@ -5,17 +5,32 @@
  
 
 namespace initialise(const String& commandLine) override {
+    // Enable all orientations for the application's desktop
     Desktop::getInstance().setOrientationsEnabled(Desktop::allOrientations);
-    mainWindow = new MainAppWindow();
+
+    // Create the main application window
+    auto mainWindow = std::make_unique<MainApplicationWindow>();
+
+    // Set the main window to be the top-level component of the application
+    mainWindow->setUsingNativeTitleBar(true);
+    mainWindow->centreWithSize(getWidth(), getHeight());
+    mainWindow->setVisible(true);
+
+    // Save the main window in a class member variable for later use
+    m_mainWindow = std::move(mainWindow);
 }
 
 void shutdown() override {
-    mainWindow = nullptr; 
+    // Release the main window
+    m_mainWindow.reset();
 }
 
-void anotherInstanceStarted(const String& commandLine) override { 
+void anotherInstanceStarted(const String& commandLine) override {
     // Display a warning message when more than one instance of the application is run
-    AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Injectora", "Only one instance of Injectora should be run at a time!", "OK");
+    AlertWindow::showMessageBox(AlertWindow::WarningIcon,
+                                "Application Already Running",
+                                "Only one instance of the application can be run at a time.",
+                                "OK");
 }
 
 
