@@ -91,31 +91,26 @@ private:
 };
 
 
-Logger::Logger(std::wstring filename)
-    : log_file(filename), DoLog(false)
-{
+class Logger {
+public:
+    explicit Logger(const std::wstring& filename) : m_logFileName(filename), m_doLog(false) {}
+    Logger(const Logger&) = delete;
+    Logger& operator=(const Logger&) = delete;
+    virtual ~Logger() = default;
+
+private:
+    std::wstring m_logFileName;
+    bool m_doLog;
+};
+
+void print_params(const t_params_struct& params) {
+    std::cout << "myDec: [" << std::dec << params.myDec << "] = [0x" << std::hex << params.myDec << "]\n";
+    std::cout << "myHex: [0x" << std::hex << params.myHex << "] = [" << std::dec << params.myHex << "]\n";
+    std::cout << "myBool: [" << std::boolalpha << params.myBool << "]\n";
+    std::cout << "myABuf: [" << (params.myABuf ? params.myABuf : "(null)") << "]\n";
+    std::wcout << L"myWBuf: [" << (params.myWBuf ? params.myWBuf : L"(null)") << L"]\n";
+    std::cout << "myEnum: [" << static_cast<std::underlying_type_t<decltype(params.myEnum)>>(params.myEnum) << "]\n";
 }
-
-Logger::Logger(std::wstring filename) : m_logFileName(std::move(filename)), m_doLog(false)
-{
-}
-
-Logger::Logger(const std::wstring& filename) : m_logFileName(filename), m_doLog(false)
-{
-}
-
-
-void print_params(const t_params_struct& p)
-{
-    std::cout << "myDec: [" << std::dec << p.myDec << "] = [0x" << std::hex << p.myDec << "]\n";
-    std::cout << "myHex: [0x" << std::hex << p.myHex << "] = [" << std::dec << p.myHex << "]\n";
-    std::cout << "myBool: [" << std::boolalpha << p.myBool << "]\n";
-    std::cout << "myABuf: [" << (p.myABuf ? p.myABuf : "(null)") << "]\n";
-    std::wcout << L"myWBuf: [" << (p.myWBuf ? p.myWBuf : L"(null)") << L"]\n";
-    std::cout << "myEnum: [" << static_cast<std::underlying_type_t<decltype(p.myEnum)>>(p.myEnum) << "]\n";
-}
-
-
 
 class Logger {
 public:
