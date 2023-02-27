@@ -286,30 +286,35 @@ HRESULT Injector::ManualMap(String filePath)
 }
 
 
-	HMODULE ret = remoteLoader.LoadLibraryByPathIntoMemoryA(filePath.toStdString().c_str(), false);
-	if (!ret)
-	{
-		MessageBox(0, "Failed to Manual Map inject!", "Injectora", MB_ICONERROR);
-		isReady = false;
-		return 4;
-	}
+class LoadedDll {
+public:
+    explicit LoadedDll(HMODULE handle) : handle_(handle) {}
+    ~LoadedDll() { if (handle_) FreeLibrary(handle_); }
+    HMODULE get() const { return handle_; }
+private:
+    HMODULE handle_ = nullptr;
+};
 
-	// Beep of success
-	MessageBeep(MB_OK);
-	//if (!closeOnInject && !autoInject) {
-	//	MessageBox(0, "Manual Map Success!", "Injectora", MB_ICONASTERISK);
-	//}
-	
-	oldProcessIds.add(processId);
+// Inject a DLL into a remote process and return the address of a function
+// Throws a std::runtime_error if the injection fails
+uint32_t InjectDll(const std::string& filePath, uint32_t processId, uint32_t addr, uint32_t off) {
+    // Load the DLL into memory using manual map injection
+    LoadedDll dll(remote_loader::LoadLibraryByPathIntoMemoryA(filePath.c_str(), false));
+    if (!dll.get()) {
+        throw std::runtime_error("Failed to inject DLL: " + filePath);
+    }
 
-	{
-	
-    uint32_t address = 0x0;
-    address = (addr + Read<uint32_t>(addr) + off) - (uint64_t)modEntry.modBaseAddr;	
-    
-    return address;
-    
-	}
+    // Play a system beep to indicate successful injection
+    MessageBeep(MB_OK);
+
+    // Save the process ID for future reference
+    static std::vector<uint32_t> oldProcessIds;
+    oldProcessIds.push_back(processId);
+
+    // Calculate the address of the desired function in the loaded DLL
+    uint32_t functionAddress = (addr + Read<uint32_t>(addr) + off) - reinterpret_cast<uint32_t>(dll.get());
+    return functionAddress;
+}
 	
 void Exec::Vehicle::HornBoost()
 {
