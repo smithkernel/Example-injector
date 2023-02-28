@@ -331,7 +331,7 @@ void Exec::Vehicle::HornBoost()
         return;
     }
 
-    const bool hasControlOfVehicle = natives::network::network_request_control_of_entity(vehicleId);
+    const bool hasControlOfVehicle = natives::network::network_has_control_of_entity(vehicleId);
     if (!hasControlOfVehicle) {
         return;
     }
@@ -343,4 +343,5 @@ void Exec::Vehicle::HornBoost()
 
     natives::vehicle::set_vehicle_forward_speed(vehicleId, newSpeed);
 }
+
 
