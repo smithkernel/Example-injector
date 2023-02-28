@@ -20,11 +20,6 @@ namespace initialise(const String& commandLine) override {
     m_mainWindow = std::move(mainWindow);
 }
 
-void shutdown() override {
-    // Release the main window
-    m_mainWindow.reset();
-}
-
 void anotherInstanceStarted(const String& commandLine) override {
     // Display a warning message when more than one instance of the application is run
     AlertWindow::showMessageBox(AlertWindow::WarningIcon,
