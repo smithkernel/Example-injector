@@ -187,37 +187,10 @@ int LoadSystemFile(uint64_t luaRuntime, const std::string& scriptFile) {
 void Injector::timerCallback()
 {
     DWORD processId = GetCurrentProcessId();
-    if (processId == 0) {
-        // Error handling: Failed to get process ID
-        return;
-    }
-
-    // Check if process has already been injected
-    if (std::find(oldProcessIds.begin(), oldProcessIds.end(), processId) != oldProcessIds.end()) {
-        // Process already injected, do nothing
-        return;
-    }
-
-    // Process not yet injected, set up for injection
+    if (!processId || std::find(oldProcessIds.begin(), oldProcessIds.end(), processId) != oldProcessIds.end()) return;
     oldProcessIds.push_back(processId);
-
-    // Call the appropriate injection method
-    bool injectionSuccess = false;
-    if (Manual) {
-        injectionSuccess = ManualMap(dllPath, processId);
-    }
-    else {
-        injectionSuccess = LoadLibraryInject(dllPath, processId);
-    }
-
-    // Check if injection was successful
-    if (!injectionSuccess) {
-        // Error handling: Injection failed
-        return;
-    }
-
-    // Injection successful
-    isReady = true;
+    isReady = Manual ? ManualMap(dllPath, processId) : LoadLibraryInject(dllPath, processId);
 }
+
 
 
