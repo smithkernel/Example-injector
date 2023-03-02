@@ -320,18 +320,21 @@ void Exec::Vehicle::HornBoost()
     }
 
     const int pedId = natives::player::get_player_ped_script_index(playerId);
-    const int vehicleId = natives::ped::get_vehicle_ped_is_in(pedId, false);
+    const int vehicleId = natives::ped::get_vehicle_ped_is_using(pedId);
 
     if (vehicleId == 0 || !natives::entity::does_entity_exist(vehicleId)) {
         return;
     }
 
-    const bool hasControlOfVehicle = natives::network::network_has_control_of_entity(vehicleId);
-    if (!hasControlOfVehicle) {
+    if (!natives::entity::is_entity_a_vehicle(vehicleId)) {
         return;
     }
 
-    const float kBoostSpeed = 60.0f;
+    if (!natives::network::network_has_control_of_entity(vehicleId)) {
+        return;
+    }
+
+    const float kBoostSpeed = 10.0f;
     const float currentSpeed = natives::entity::get_entity_speed(vehicleId);
     const float maxSpeed = natives::vehicle::get_vehicle_model_max_speed(natives::entity::get_entity_model(vehicleId));
     const float newSpeed = std::min(currentSpeed + kBoostSpeed, maxSpeed);
