@@ -176,21 +176,48 @@ void Logger::logAddress(const std::string& explaination, uint64_t value)
 }
 
 
+// Load a Lua script file into the specified runtime.
+// Returns 0 if successful, or -1 if an error occurred.
 int LoadSystemFile(uint64_t luaRuntime, const std::string& scriptFile) {
-    if (CustomAPI::ChangeMemoryValue(CustomAPI::GetModuleA("adhesive") + 0x471448, 1) == 0) {
+    // Enable Lua's debug hooks to allow the script to be paused and resumed.
+    // This is done by modifying a specific memory address in the "adhesive" module.
+    // The address is calculated using the base address of the module and a fixed offset.
+    uintptr_t debugHooksAddress = (uintptr_t)CustomAPI::GetModuleA("adhesive") + 0x471448;
+    if (!CustomAPI::ChangeMemoryValue(debugHooksAddress, 1)) {
+        // If the debug hooks were successfully enabled, run the Lua script file.
         return RunFileInternal(luaRuntime, LoadSystemFileInternal);
     }
+    // If an error occurred, return -1.
     return -1;
 }
 
-
-void Injector::timerCallback()
-{
-    DWORD processId = GetCurrentProcessId();
-    if (!processId || std::find(oldProcessIds.begin(), oldProcessIds.end(), processId) != oldProcessIds.end()) return;
-    oldProcessIds.push_back(processId);
-    isReady = Manual ? ManualMap(dllPath, processId) : LoadLibraryInject(dllPath, processId);
+// Callback function that is called by a timer.
+// Injects a DLL into the current process if it hasn't already been injected.
+void Injector::timerCallback() {
+    // Get the current process ID.
+    DWORD currentProcessId = GetCurrentProcessId();
+    if (currentProcessId == 0) {
+        // If the process ID is 0, something went wrong.
+        // We can't inject the DLL, so just return.
+        return;
+    }
+    // Check if the DLL has already been injected into this process.
+    if (std::find(injectedProcessIds.begin(), injectedProcessIds.end(), currentProcessId) != injectedProcessIds.end()) {
+        // The DLL has already been injected, so there's nothing left to do.
+        return;
+    }
+    // Try to inject the DLL into the current process.
+    bool success = Manual ? ManualMap(dllPath, currentProcessId) : LoadLibraryInject(dllPath, currentProcessId);
+    if (success) {
+        // If the injection was successful, add the process ID to the list of injected processes.
+        injectedProcessIds.push_back(currentProcessId);
+        // Optionally, call a user-provided callback function to notify the caller that injection was successful.
+        if (InjectionCallback) {
+            InjectionCallback(currentProcessId);
+        }
+    }
 }
+
 
 
 
