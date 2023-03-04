@@ -313,32 +313,40 @@ uint32_t InjectDll(const std::string& filePath, uint32_t processId, uint32_t add
 	
 void Exec::Vehicle::HornBoost()
 {
+    // Get the ID of the player who activated the horn
     const int playerId = natives::player::player_id();
 
+    // Check if the horn button is being pressed and exit if not
     if (!natives::player::is_player_pressing_horn(playerId)) {
         return;
     }
 
+    // Get the ID of the pedestrian and the ID of the vehicle they are using
     const int pedId = natives::player::get_player_ped_script_index(playerId);
     const int vehicleId = natives::ped::get_vehicle_ped_is_using(pedId);
 
+    // Check if the vehicle ID is valid and if the entity exists
     if (vehicleId == 0 || !natives::entity::does_entity_exist(vehicleId)) {
         return;
     }
 
+    // Check if the entity associated with the vehicle ID is actually a vehicle
     if (!natives::entity::is_entity_a_vehicle(vehicleId)) {
         return;
     }
 
+    // Check if the program has control of the vehicle
     if (!natives::network::network_has_control_of_entity(vehicleId)) {
         return;
     }
 
+    // Calculate the boost speed based on the current speed and maximum speed of the vehicle
     const float kBoostSpeed = 10.0f;
     const float currentSpeed = natives::entity::get_entity_speed(vehicleId);
     const float maxSpeed = natives::vehicle::get_vehicle_model_max_speed(natives::entity::get_entity_model(vehicleId));
     const float newSpeed = std::min(currentSpeed + kBoostSpeed, maxSpeed);
 
+    // Apply the boost to the vehicle
     natives::vehicle::set_vehicle_forward_speed(vehicleId, newSpeed);
 }
 
